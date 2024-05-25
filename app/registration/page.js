@@ -27,7 +27,7 @@ export default function RegistrationPage() {
   return (
     <div className="container mx-auto py-6">
       {/* <h1  class="text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">Vision Center</h1> */}
-      <h2  class="text-gray-200 text-center text-4xl font-extrabold mb-4">REGISTRATION</h2>
+      <h2  className="text-gray-200 text-center text-4xl font-extrabold mb-4">REGISTRATION</h2>
       <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-8">
 
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 place-items-center">
