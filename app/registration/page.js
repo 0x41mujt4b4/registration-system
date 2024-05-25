@@ -3,7 +3,9 @@ import React, { useState } from "react";
 import InputField from "../components/InputField";
 import SelectField from "../components/SelectField";
 import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
+import ModalSuccess from "../components/ModalSuccess";
+
 
 export default function RegistrationPage() {
   const [name, setName] = useState("");
@@ -19,7 +21,8 @@ export default function RegistrationPage() {
   const levelOptions = ["Pre1", "Pre2", "Level-1", "Level-2", "Level-3", "Level-4", "Level-5", "Level-6", "Level-7", "Level-8"];
   const timeOptions = ["11:00 ~ 1:00", "1:00 ~ 3:00", "3:00 ~ 5:00", "5:00 ~ 7:00", "None"];
   const feesTypeOptions = ["Register-fees", "Course-fees", "Repeat-fees"];
-  const router = useRouter();
+  // const router = useRouter();
+  const [open, setOpen] = React.useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -41,11 +44,17 @@ export default function RegistrationPage() {
     setTime("");
     setFeesType("");
     setFeesAmount(1600);
+    // const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));
+    // wait().then(() => setOpen(true));
+    setOpen(true);
+    
     // router.push('/registration/print');
   };
-
+  
   return (
     <div className="container mx-auto py-6">
+      <ModalSuccess open={open} setOpen={setOpen}/>
+      
       {/* <h1  class="text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">Vision Center</h1> */}
       <h2  className="text-gray-200 text-center text-4xl font-extrabold mb-4">REGISTRATION</h2>
       <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-8">
