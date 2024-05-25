@@ -3,7 +3,7 @@ import Dashboard from "@/app/dashboard/page";
 
 export default function Page() {
   return (
-    <main className="">
+    <main className="flex max-h-full">
       <Dashboard />
     </main>
   );
