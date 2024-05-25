@@ -1,10 +1,10 @@
 import * as Select from "@radix-ui/react-select";
 import React from "react";
 
-export default function SelectField({ id, label, options, placeholder, onChange }) {
+export default function SelectField({ id, label, options, placeholder, value, onChange }) {
 
   return (
-      <Select.Root>
+      <Select.Root value={value} onValueChange={onChange}>
         <div className="w-64 max-w-xs">
         <label htmlFor={id} className="block uppercase tracking-wide text-gray-200 text-xs font-bold mb-2">{label}</label>
           <Select.Trigger className="w-full inline-flex items-center justify-between px-3 py-2 text-sm text-gray-600 bg-white border rounded-lg shadow-sm outline-none focus:ring-offset-2 focus:ring-indigo-600 focus:ring-2">

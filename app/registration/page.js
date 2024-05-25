@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import InputField from "../components/InputField";
 import SelectField from "../components/SelectField";
-import Button from "../components/Button";
-import "@/app/globals.css";
+import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
 
 export default function RegistrationPage() {
   const [name, setName] = useState("");
@@ -19,9 +19,29 @@ export default function RegistrationPage() {
   const levelOptions = ["Pre1", "Pre2", "Level-1", "Level-2", "Level-3", "Level-4", "Level-5", "Level-6", "Level-7", "Level-8"];
   const timeOptions = ["11:00 ~ 1:00", "1:00 ~ 3:00", "3:00 ~ 5:00", "5:00 ~ 7:00", "None"];
   const feesTypeOptions = ["Register-fees", "Course-fees", "Repeat-fees"];
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // print the registration form
+    console.log("form: ", {
+      name,
+      session,
+      course,
+      level,
+      time,
+      feesType,
+      feesAmount
+    })
+    // Force refresh the page
+    setName("");
+    setSession("");
+    setCourse("");
+    setLevel("");
+    setTime("");
+    setFeesType("");
+    setFeesAmount(1600);
+    // router.push('/registration/print');
   };
 
   return (
@@ -30,30 +50,34 @@ export default function RegistrationPage() {
       <h2  className="text-gray-200 text-center text-4xl font-extrabold mb-4">REGISTRATION</h2>
       <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-8">
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 place-items-center">
+      <form onSubmit={handleSubmit} className="grid md:grid-cols-3 grid-cols-2 gap-4 place-items-center">
         <InputField id="name" label="Name" value={name} onChange={setName} />
         <SelectField
           id="time"
           label="Time"
           options={timeOptions}
+          value={time}
           onChange={setTime}
         />
         <SelectField
           id="level"
           label="Level"
           options={levelOptions}
+          value={level}
           onChange={setLevel}
         />
         <SelectField
           id="fees-type"
           label="Fees Type"
           options={feesTypeOptions}
+          value={feesType}
           onChange={setFeesType}
         />
         <SelectField
           id="course"
           label="Course"
           options={courseOptions}
+          value={course}
           onChange={setCourse}
         />
         <InputField
@@ -67,10 +91,27 @@ export default function RegistrationPage() {
           id="session"
           label="Session"
           options={sessionOptions}
+          value={session}
           onChange={setSession}
         />
-        <div className="col-start-3 justify-self-end self-end">
+        <div className="space-x-4 col-start-3 justify-self-center self-end ">
           <Button
+          className="gap-2 text-sm text-white duration-150 bg-red-600 rounded-lg hover:bg-red-500 active:bg-red-700"
+          type="button"
+            onClick={() => {
+              setName("");
+              setSession("");
+              setCourse("");
+              setLevel("");
+              setTime("");
+              setFeesType("");
+              setFeesAmount(1600);
+            }}
+          >
+            Clear
+          </Button>
+          <Button
+          className="gap-2 text-sm text-white duration-150 bg-indigo-600 rounded-lg hover:bg-indigo-500 active:bg-indigo-700"
             type="submit"
           >
             Save & Print
