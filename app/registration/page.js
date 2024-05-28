@@ -5,6 +5,11 @@ import SelectField from "../components/SelectField";
 import { Button } from "@/components/ui/button";
 // import { useRouter } from 'next/navigation';
 import ModalSuccess from "../components/ModalSuccess";
+import getStudents from "@/server/getStudents";
+import { date } from "zod";
+import addStudent from "@/server/addStudent";
+import addCourse from "@/server/addCourse";
+import addFees from "@/server/addFees";
 
 
 export default function RegistrationPage() {
@@ -24,18 +29,28 @@ export default function RegistrationPage() {
   // const router = useRouter();
   const [open, setOpen] = React.useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      // add student to the database then use the student id to add course & fees
+      const student_id = await addStudent({ name, date: new Date() });
+      await addCourse({ student_id, course_name: course, course_level: level, session_type: session, session_time: time });
+      await addFees({ student_id, fees_type: feesType, amount: feesAmount, date: new Date()});
+      // console.log("fees: ", feesType, feesAmount);
+      
+    } catch (error) {
+      console.log("Error adding student", error);
+    }
     // print the registration form
-    console.log("form: ", {
-      name,
-      session,
-      course,
-      level,
-      time,
-      feesType,
-      feesAmount
-    })
+    // console.log("form: ", {
+    //   name,
+    //   session,
+    //   course,
+    //   level,
+    //   time,
+    //   feesType,
+    //   feesAmount
+    // })
     // Force refresh the page
     setName("");
     setSession("");

@@ -1,22 +1,26 @@
-import db from '@/server/mysql';
+"use server";
+import db from "@/server/mysql";
 
-async function addCourse(form) {
-    try {
-        // Create a connection to the database
-        const connection = await db();
+export default async function addCourse(course) {
+  try {
+    // Create a connection to the database
+    const connection = await db();
+    console.log("adding course..");
+    // Insert the course into the database
+    const courses_query =
+      "INSERT INTO courses (student_id, course_name, course_level, session_type, session_time) VALUES (?, ?, ?, ?, ?)";
+    const [result] = await connection.execute(courses_query, [
+      course.student_id,
+      course.course_name,
+      course.course_level,
+      course.session_type,
+      course.session_time,
+    ]);
 
-        // Insert the course into the database
-        const courses_query = 'INSERT INTO courses (student_id, course_name, course_level, session_type, session_time) VALUES (?, ?, ?, ?, ?)'
-        const [result] = await connection.execute(courses_query, [student_id, form.course_name, form.course_level, form.session_type, form.session_time]);
-
-        // Close the connection
-        await connection.end();
-
-        return result; // Return the ID of the inserted user
-    } catch (error) {
-        console.error('Error adding course:', error);
-        throw error;
-    }
+    console.log("added course successfly!");
+    return result[0]; // Return the ID of the inserted user
+  } catch (error) {
+    console.error("Error adding course:", error);
+    throw error;
+  }
 }
-
-module.exports = addCourse;

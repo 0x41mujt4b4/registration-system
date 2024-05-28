@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {
   CaretSortIcon,
   ChevronDownIcon,
@@ -42,103 +42,12 @@ import {
 import {columns} from './columns';
 import DataTable from "./data-table";
 import DataTablePagination from "./DataTablePagination";
-
-const data = [
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: 343,
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-  {
-    id: "001",
-    name: "محمد أحمد علي عمر",
-    session: "Regular",
-    course: "Communication",
-    level: "Level-6",
-    time: "01/05/2024",
-    fees_type: "Course Fees",
-    amount: 1500,
-  },
-]
-
+import { get } from "http";
+import getStudents from "@/server/getStudents";
 
 
 export default function DataTableDemo() {
+  const [data, setData] = useState([{}])
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState(
     []
@@ -147,13 +56,26 @@ export default function DataTableDemo() {
     useState({})
   const [rowSelection, setRowSelection] = useState({})
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getStudents();
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const table = useReactTable({
     data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -165,6 +87,7 @@ export default function DataTableDemo() {
       rowSelection,
     },
   })
+  
 
   return (
     <div className="flex flex-col w-full h-full px-4">
