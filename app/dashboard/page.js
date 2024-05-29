@@ -39,15 +39,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {columns} from './columns';
+import Columns from './columns';
 import DataTable from "./data-table";
 import DataTablePagination from "./DataTablePagination";
 import { get } from "http";
 import getStudents from "@/server/getStudents";
+import { set } from "zod";
 
 
 export default function DataTableDemo() {
-  const [data, setData] = useState([{}])
+  const [isLoading, setIsLoading] = useState(true)
+  const [data, setData] = useState(Array(8).fill({}))
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState(
     []
@@ -55,12 +57,13 @@ export default function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] =
     useState({})
   const [rowSelection, setRowSelection] = useState({})
-
+  const columns = Columns({isLoading})
   useEffect(() => {
     const fetchData = async () => {
       try {
         const result = await getStudents();
         setData(result);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -128,7 +131,7 @@ export default function DataTableDemo() {
         </DropdownMenu>
       </div>
       <div className="flex bg-white h-[28rem]">
-      <DataTable table={table} columns={columns}/>
+      <DataTable table={table} columns={columns} isLoading={isLoading}/>
       </div>
       {/* <DataTablePagination table={table}/> */}
     </div>

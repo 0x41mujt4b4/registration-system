@@ -16,11 +16,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@radix-ui/themes";
 
-export const columns = [
+export default function Columns({isLoading}) {
+  return (
+  [
   {
     accessorKey: "id",
     header: ({ column }) => (
+      isLoading ? <Skeleton /> :
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -29,7 +33,7 @@ export const columns = [
         <CaretSortIcon className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="lowercase ml-6">{row.getValue("id")}</div>,
+    cell: ({ row }) => isLoading ? <Skeleton /> : <div className="lowercase ml-6">{row.getValue("id")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
@@ -37,6 +41,7 @@ export const columns = [
     accessorKey: "name",
     header: ({ column }) => {
       return (
+        isLoading ? <Skeleton /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -46,47 +51,54 @@ export const columns = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) => isLoading ? <Skeleton /> : <div className="lowercase">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "session",
-    header: "Session",
+    header: isLoading ? <Skeleton /> : "Session",
     cell: ({ row }) => (
+      isLoading ? <Skeleton /> :
       <div className="capitalize">{row.getValue("session")}</div>
     ),
   },
   {
     accessorKey: "course",
-    header: "Course",
-    cell: ({ row }) => (
+    header: isLoading ? <Skeleton /> : "Course",
+    cell: ({ row }) => (isLoading ? <Skeleton /> : 
       <div className="capitalize">{row.getValue("course")}</div>
     ),
   },
   {
     accessorKey: "level",
-    header: "Level",
+    header: isLoading ? <Skeleton /> : "Level",
     cell: ({ row }) => (
+      isLoading ? <Skeleton /> :
       <div className="capitalize">{row.getValue("level")}</div>
     ),
   },
   {
     accessorKey: "time",
-    header: "Time",
+    header: isLoading ? <Skeleton /> : "Time",
     cell: ({ row }) => (
+      isLoading ? <Skeleton /> : 
       <div className="capitalize">{row.getValue("time")}</div>
     ),
   },
   {
     accessorKey: "fees_type",
-    header: "Fees_Type",
+    header: isLoading ? <Skeleton /> : "Fees_Type",
     cell: ({ row }) => (
+      isLoading ? <Skeleton /> : 
       <div className="capitalize">{row.getValue("fees_type")}</div>
     ),
   },
   {
     accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    header: () => isLoading ? <Skeleton /> : <div className="text-right">Amount</div>,
     cell: ({ row }) => {
+      if (isLoading) {
+        return <Skeleton />;
+      }
       const amount = parseFloat(row.getValue("amount"));
 
       // Format the amount as a dollar amount
@@ -99,9 +111,13 @@ export const columns = [
     },
   },
   {
+    header: isLoading ? <Skeleton /> : '',
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
+      if (isLoading) {
+        return <Skeleton />;
+      }
       const payment = row.original;
 
       return (
@@ -127,4 +143,5 @@ export const columns = [
       );
     },
   },
-];
+])
+}
