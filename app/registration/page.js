@@ -75,7 +75,7 @@ export default function RegistrationPage() {
       <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-8">
 
       <form onSubmit={handleSubmit} className="grid md:grid-cols-3 grid-cols-2 gap-4 place-items-center">
-        <InputField id="name" label="Name" value={name} onChange={setName} />
+        <InputField id="name" label="Name" value={name} onChange={setName} required/>
         <SelectField
           id="time"
           label="Time"

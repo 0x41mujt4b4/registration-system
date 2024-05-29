@@ -1,4 +1,4 @@
-export default function InputField({ id, label, type, value, defaultValue, onChange }) {
+export default function InputField({ id, label, type, value, defaultValue, onChange, required}) {
     return (
         <div className="relative max-w-xs ">
             <label htmlFor={id} className="block uppercase tracking-wide text-gray-200 text-xs font-bold mb-2">{label}</label>
@@ -13,6 +13,7 @@ export default function InputField({ id, label, type, value, defaultValue, onCha
                 </span>
             )}
             <input
+                required={required}
                 type={type}
                 id={id}
                 value={value}
