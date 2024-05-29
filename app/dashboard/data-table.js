@@ -24,13 +24,13 @@ import {
 
 export default function DataTable({table, columns}) {
     return (
-        <Table className="">
+        <Table className="table-auto w-full">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="bg-transparent">
+            <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="bg-gray-200 text-black sticky top-0">
+                  <TableHead key={header.id} className="bg-sky-300 text-black sticky top-0">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -48,8 +48,8 @@ export default function DataTable({table, columns}) {
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="hover:bg-gray-100"
+                // data-state={row.getIsSelected() && "selected"}
+                className="hover:bg-sky-100 border-b border-black"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

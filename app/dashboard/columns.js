@@ -51,14 +51,14 @@ export default function Columns({isLoading}) {
         </Button>
       );
     },
-    cell: ({ row }) => isLoading ? <Skeleton /> : <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) => isLoading ? <Skeleton /> : <div className="font-serif font-medium text-lg">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "session",
     header: isLoading ? <Skeleton /> : "Session",
     cell: ({ row }) => (
       isLoading ? <Skeleton /> :
-      <div className="capitalize">{row.getValue("session")}</div>
+      <div className="capitalize ">{row.getValue("session")}</div>
     ),
   },
   {
@@ -107,7 +107,7 @@ export default function Columns({isLoading}) {
         currency: "USD",
       }).format(amount);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="text-right">{formatted}</div>;
     },
   },
   {
