@@ -4,13 +4,20 @@
 // import { cookies } from 'next/headers';
 // import { NextResponse } from 'next/server';
 // import getUser from '@/server/getUser';
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Spinner from "../components/Spinner";
+import Error from "../components/error";
 
 export default function Login() {
   const router = useRouter();
+  const [isLoading , setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState(null);
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const formData = new FormData(e.target);
     const response = await signIn("credentials", {
       username: formData.get("username"),
@@ -22,6 +29,10 @@ export default function Login() {
       router.push("/dashboard");
       router.refresh();
       console.log("response: ", response);
+    }
+    else {
+      setIsLoading(false);
+      setLoginError('wrong username or password. Please try again.');
     }
   };
 
@@ -68,9 +79,10 @@ export default function Login() {
               className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
             />
           </div>
-          <button className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150">
-            Sign in
+          <button disabled={isLoading} className={`w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 ${isLoading ? 'px-4 py-2 text-sm text-white active:bg-indigo-300 bg-indigo-300 rounded-lg hover:bg-indigo-300 cursor-not-allowed' : ''}`}>
+            {isLoading ? <Spinner /> : 'Sign in'}
           </button>
+          {loginError && <Error title={'Login failed: '} message={loginError} setMessage={setLoginError}/>}
           {/* <div className="text-center">
                       <a href="javascript:void(0)" className="hover:text-indigo-600">Forgot password?</a>
                   </div> */}
