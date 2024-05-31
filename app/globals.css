@@ -57,7 +57,7 @@
       @apply border-border;
     }
     body {
-      background-color: rgb(14, 43, 68);
+      background-color: rgb(49, 62, 73);
       /* @apply bg-background text-foreground; */
     }
   }

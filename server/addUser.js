@@ -9,7 +9,7 @@ async function addUser(user) {
         const [result] = await connection.execute('INSERT INTO users (username, password) VALUES (?, ?)', [user.username, user.password]);
 
         // Close the connection
-        await connection.end();
+        // await connection.end();
 
         return result; // Return the ID of the inserted user
     } catch (error) {

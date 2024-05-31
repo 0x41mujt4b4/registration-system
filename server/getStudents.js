@@ -21,7 +21,7 @@ export default async function getStudents() {
             LEFT JOIN 
                 Fees ON students.id = Fees.student_id;`;
     const [rows] = await connection.execute(query);
-    console.log("rows: ", rows);
+    // console.log("rows: ", rows);
     return rows;
   } catch (error) {
     console.error("Failed to fetch user:", error);

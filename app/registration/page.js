@@ -70,7 +70,7 @@ export default function RegistrationPage() {
     <div className="container mx-auto py-6">
       <ModalSuccess open={open} setOpen={setOpen}/>
       
-      <h1  class="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-200 md:text-5xl">VISION CENTER</h1>
+      <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-200 md:text-5xl">VISION CENTER</h1>
       <h2  className="font-serif text-gray-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2>
       <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-8">
 
