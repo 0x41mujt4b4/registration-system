@@ -72,6 +72,9 @@ export default function DataTableDemo() {
     fetchData();
   }, []);
 
+  const handleExport = () => {
+    console.log("Exporting data...");
+  }
   const table = useReactTable({
     data,
     columns,
@@ -129,6 +132,9 @@ export default function DataTableDemo() {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button variant="outline" className="ml-2 active:bg-gray-400" onClick={handleExport}>
+          Export
+        </Button>
       </div>
       <div className="flex bg-white h-[28rem]">
       <DataTable table={table} columns={columns} isLoading={isLoading}/>
