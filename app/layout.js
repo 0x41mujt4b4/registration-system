@@ -1,12 +1,13 @@
 import { Roboto } from "next/font/google";
-import { Theme } from '@radix-ui/themes';
+import { Theme } from "@radix-ui/themes";
 import Navbar from "./components/Navbar";
-import '@radix-ui/themes/styles.css';
+import AuthProvider from "./components/AuthProvider";
+import "@radix-ui/themes/styles.css";
 import "./globals.css";
 
 const roboto = Roboto({
-    subsets: ["latin"],
-    weight: ['100', '300', '400', '500', '700', '900'],
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "500", "700", "900"],
 });
 
 export const metadata = {
@@ -18,10 +19,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <Theme hasBackground={false}>
-        <Navbar />
-        {children}
-        </Theme>
+        <AuthProvider>
+          <Theme hasBackground={false}>
+            <Navbar />
+            {children}
+          </Theme>
+        </AuthProvider>
       </body>
     </html>
   );
