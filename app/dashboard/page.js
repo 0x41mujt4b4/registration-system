@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {
   CaretSortIcon,
   ChevronDownIcon,
@@ -45,17 +45,16 @@ import DataTablePagination from "./DataTablePagination";
 import { get } from "http";
 import getStudents from "@/server/getStudents";
 import { set } from "zod";
+import * as XLSX from "xlsx";
 
 
 export default function DataTableDemo() {
+  const tbl = useRef(null)
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState(Array(8).fill({}))
   const [sorting, setSorting] = useState([])
-  const [columnFilters, setColumnFilters] = useState(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    useState({})
+  const [columnFilters, setColumnFilters] = useState([])
+  const [columnVisibility, setColumnVisibility] = useState({})
   const [rowSelection, setRowSelection] = useState({})
   const columns = Columns({isLoading})
   useEffect(() => {
@@ -74,6 +73,14 @@ export default function DataTableDemo() {
 
   const handleExport = () => {
     console.log("Exporting data...");
+    // generate a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    // create a workbook
+    const workbook = XLSX.utils.book_new();
+    // add worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, "students_report");
+    // write to XLSX
+    XLSX.writeFileXLSX(workbook, "students_report.xlsx");
   }
   const table = useReactTable({
     data,
@@ -132,12 +139,12 @@ export default function DataTableDemo() {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline" className="ml-2 active:bg-gray-400" onClick={handleExport}>
+        <Button variant="outline" className="ml-2 active:bg-gray-400" onClick={() => handleExport()}>
           Export
         </Button>
       </div>
       <div className="flex bg-white h-[28rem]">
-      <DataTable table={table} columns={columns} isLoading={isLoading}/>
+      <DataTable table={table} columns={columns} innerRef={tbl}/>
       </div>
       {/* <DataTablePagination table={table}/> */}
     </div>

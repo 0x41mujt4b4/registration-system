@@ -22,9 +22,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export default function DataTable({table, columns}) {
+export default function DataTable({table, columns, innerRef}) {
     return (
-        <Table className="table-auto w-full">
+        <Table className="table-auto w-full" ref={innerRef}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
