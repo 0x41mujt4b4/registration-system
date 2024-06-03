@@ -76,7 +76,7 @@ export default function RegistrationPage() {
       <img
               src="/vision_logo.png"
               alt="vision logo"
-              className="mx-auto h-28 w-auto" />
+              className="mx-auto h-28 w-auto mb-2" />
       <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4 place-items-center">
         <InputField id="name" label="Name" value={name} onChange={setName} required/>
         <SelectField
@@ -93,20 +93,7 @@ export default function RegistrationPage() {
           value={level}
           onChange={setLevel}
         />
-        <SelectField
-          id="fees-type"
-          label="Fees Type"
-          options={feesTypeOptions}
-          value={feesType}
-          onChange={setFeesType}
-        />
-        <SelectField
-          id="course"
-          label="Course"
-          options={courseOptions}
-          value={course}
-          onChange={setCourse}
-        />
+        
         <InputField
           id="fees-amount"
           label="Fees Amount"
@@ -115,15 +102,30 @@ export default function RegistrationPage() {
           onChange={setFeesAmount}
         />
         <SelectField
+          id="course"
+          label="Course"
+          options={courseOptions}
+          value={course}
+          onChange={setCourse}
+        />
+        <SelectField
           id="session"
           label="Session"
           options={sessionOptions}
           value={session}
           onChange={setSession}
         />
-        <div className="space-x-4 col-start-3 justify-self-center self-end ">
+        <SelectField
+          id="fees-type"
+          label="Fees Type"
+          options={feesTypeOptions}
+          value={feesType}
+          onChange={setFeesType}
+          className="px-1.5"
+        />
+        <div className="space-x-4 lg:px-12 col-start-3 justify-self-end self-end ">
           <Button
-          className="gap-2 text-sm text-white duration-150 bg-red-600 rounded-lg hover:bg-red-500 active:bg-red-700"
+          className="text-sm text-white duration-150 bg-red-600 rounded-lg hover:bg-red-500 active:bg-red-700"
           type="button"
             onClick={() => {
               setName("");
@@ -138,7 +140,7 @@ export default function RegistrationPage() {
             Clear
           </Button>
           <Button
-          className="gap-2 text-sm text-white duration-150 bg-indigo-600 rounded-lg hover:bg-indigo-500 active:bg-indigo-700"
+          className="text-sm text-white duration-150 bg-sky-600 rounded-lg hover:bg-sky-500 active:bg-sky-700"
             type="submit"
           >
             Save & Print
