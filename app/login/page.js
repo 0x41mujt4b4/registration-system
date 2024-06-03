@@ -46,20 +46,18 @@ export default function Login() {
     {
       session.status === 'authenticated' ? router.push('/') :
       session.status === 'loading' ? <Loading /> :
-      <div className="max-w-sm w-full text-gray-600">
-        <div className="text-center">
-            {/* eslint-disable-next-line */}
-          <img
-            src="https://floatui.com/logo.svg"
-            width={150}
-            className="mx-auto"
-          />
-          <div className="mt-5 space-y-2">
+      <div className="max-w-md w-full bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg py-8 px-16">
+        <div className="flex flex-col items-center">
+        <img
+              src="/vision_logo.png"
+              alt="vision logo"
+              className="mx-auto h-28 w-auto" />
+          {/* <div className="mt-5 space-y-2">
             <h3 className="text-white text-2xl font-bold sm:text-3xl">
               Vision Center System
             </h3>
-            {/* <p className="">Don't have an account? <a href="javascript:void(0)" className="font-medium text-indigo-600 hover:text-indigo-500">Sign up</a></p> */}
-          </div>
+            <p className="">Don't have an account? <a href="javascript:void(0)" className="font-medium text-sky-600 hover:text-sky-500">Sign up</a></p>
+          </div> */}
         </div>
         <form
           onSubmit={handleLogin}
@@ -73,7 +71,7 @@ export default function Login() {
               type="text"
               id="username"
               required
-              className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+              className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-sky-600 shadow-sm rounded-lg"
             />
           </div>
           <div>
@@ -83,16 +81,16 @@ export default function Login() {
               type="password"
               id="password"
               required
-              className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+              className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-sky-600 shadow-sm rounded-lg"
             />
           </div>
-          <button disabled={isLoading} className={`w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 ${isLoading ? 'px-4 py-2 text-sm text-white active:bg-indigo-300 bg-indigo-300 rounded-lg hover:bg-indigo-300 cursor-not-allowed' : ''}`}>
+          <button disabled={isLoading} className={`w-full px-4 py-2 text-white font-medium bg-sky-600 hover:bg-sky-500 active:bg-sky-600 rounded-lg duration-150 ${isLoading ? 'px-4 py-2 text-sm text-white active:bg-sky-300 bg-sky-300 rounded-lg hover:bg-sky-300 cursor-not-allowed' : ''}`}>
             {isLoading ? <span className="flex items-center justify-center"><Spinner size="3" className="text-blue-200"
       /></span>: 'Sign in'}
           </button>
           {loginError && <Error title={'Login failed: '} message={loginError} setMessage={setLoginError}/>}
           {/* <div className="text-center">
-                      <a href="javascript:void(0)" className="hover:text-indigo-600">Forgot password?</a>
+                      <a href="javascript:void(0)" className="hover:text-sky-600">Forgot password?</a>
                   </div> */}
         </form>
       </div>

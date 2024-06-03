@@ -57,7 +57,13 @@
       @apply border-border;
     }
     body {
-      background-color: rgb(49, 62, 73);
+      /* add background logo */
+      background-image: url('/vision_background.png');
+      background-size: cover;
+      background-position: center;
+      /* mix-blend-mode: overlay; */
+      /* background-color: rgb(49, 62, 73); */
+      background-color: rgb(39, 156, 191);
       /* @apply bg-background text-foreground; */
     }
   }

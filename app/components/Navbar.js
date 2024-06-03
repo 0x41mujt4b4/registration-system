@@ -29,13 +29,10 @@ export default function Navbar() {
       <div className="flex px-4 mx-auto justify-between">
         <div className="flex items-center justify-between py-3 md:py-2 md:block">
           <a href="/">
-            {/* eslint-disable */}
             <img
-              src="https://www.floatui.com/logo.svg"
-              width={120}
-              height={50}
-              alt="Float UI logo"
-            />
+              src="/vision_logo.png"
+              alt="vision logo"
+              className="h-8 w-auto" />
           </a>
         </div>
         <div

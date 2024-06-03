@@ -70,11 +70,14 @@ export default function RegistrationPage() {
     <div className="container mx-auto py-6">
       <ModalSuccess open={open} setOpen={setOpen}/>
       
-      <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-200 md:text-5xl">VISION CENTER</h1>
-      <h2  className="font-serif text-gray-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2>
-      <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-8">
-
-      <form onSubmit={handleSubmit} className="grid md:grid-cols-3 grid-cols-2 gap-4 place-items-center">
+      {/* <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-200 md:text-5xl">VISION CENTER</h1> */}
+      {/* <h2  className="font-serif text-gray-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2> */}
+      <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-10">
+      <img
+              src="/vision_logo.png"
+              alt="vision logo"
+              className="mx-auto h-28 w-auto" />
+      <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4 place-items-center">
         <InputField id="name" label="Name" value={name} onChange={setName} required/>
         <SelectField
           id="time"
