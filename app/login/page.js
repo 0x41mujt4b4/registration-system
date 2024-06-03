@@ -84,7 +84,7 @@ export default function Login() {
             />
           </div>
           <button disabled={isLoading} className={`w-full px-4 py-2 text-white font-medium bg-sky-600 hover:bg-sky-500 active:bg-sky-600 rounded-lg duration-150 ${isLoading ? 'px-4 py-2 text-white active:bg-sky-300 bg-sky-300 rounded-lg hover:bg-sky-300 cursor-not-allowed' : ''}`}>
-            {isLoading ? <span className="flex items-center justify-center"><Spinner size="3" className="text-blue-200"
+            {isLoading ? <span className="flex items-center justify-center"><Spinner size="3" className="text-white"
       /></span>: 'Sign in'}
           </button>
           {loginError && <Error title={'Login failed: '} message={loginError} setMessage={setLoginError}/>}

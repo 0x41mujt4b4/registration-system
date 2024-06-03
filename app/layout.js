@@ -11,6 +11,9 @@ const roboto = Roboto({
 });
 
 export const metadata = {
+  icons: {
+    icon: '/vision_logo.png',
+  },
   title: "Registration System",
   description: "System to register students and manage courses",
 };

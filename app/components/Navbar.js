@@ -17,7 +17,7 @@ export default function Navbar() {
   // Replace  paths with your paths
   const navigation = [
     { title: "Registration", path: "/registration" },
-    // { title: "Integrations", path: "" },
+    { title: "Dashboard", path: "/dashboard" },
     // { title: "Customers", path: "" },
     // { title: "Pricing", path: "" }
   ];
@@ -25,14 +25,14 @@ export default function Navbar() {
   // const cookies = new Cookies();
   // const router = useRouter()
   return (
-    <nav className="bg-transparent border-b w-full md:static md:text-sm md:border-none">
+    <nav className="bg-sky-300 border-b w-full md:static md:text-sm md:border-none mb-4">
       <div className="flex px-4 mx-auto justify-between">
         <div className="flex items-center justify-between py-3 md:py-2 md:block">
           <a href="/">
             <img
               src="/vision_logo.png"
               alt="vision logo"
-              className="h-8 w-auto" />
+              className="h-auto w-10" />
           </a>
         </div>
         <div
@@ -41,26 +41,26 @@ export default function Navbar() {
           <ul className="items-center flex space-x-6">
             {navigation.map((item, idx) => {
               return (
-                <li key={idx} className="text-gray-100 hover:text-indigo-600">
+                <li key={idx} className="text-white hover:text-sky-600">
                   <a href={item.path} className="block">
                     {item.title}
                   </a>
                 </li>
               );
             })}
-            {session.status === 'loading' ? '' : <span className="hidden w-px h-6 bg-gray-300 md:block"></span>}
+            {session.status === 'loading' ? '' : <span className="hidden w-px h-6 bg-white md:block"></span>}
             <div className="items-center flex">
               {session.status === 'loading' ? '' : session.data ? (
                     <Logout />
                 ) : (
                     <li>
-                        <a href="/login" className="block py-3 text-center text-gray-300 hover:text-indigo-600 border rounded-lg md:border-none">
+                        <a href="/login" className="block py-3 text-center text-white hover:text-sky-600 border rounded-lg md:border-none">
                             Log in
                         </a>
                     </li>
                 )}
               {/* <li>
-                                <a href="" className="block py-3 px-4 font-medium text-center text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 active:shadow-none rounded-lg shadow md:inline">
+                                <a href="" className="block py-3 px-4 font-medium text-center text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 active:shadow-none rounded-lg shadow md:inline">
                                     Sign in
                                 </a>
                             </li> */}

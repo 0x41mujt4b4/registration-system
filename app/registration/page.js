@@ -67,7 +67,7 @@ export default function RegistrationPage() {
   };
   
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto">
       <ModalSuccess open={open} setOpen={setOpen}/>
       
       {/* <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-200 md:text-5xl">VISION CENTER</h1> */}
