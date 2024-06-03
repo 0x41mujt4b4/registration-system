@@ -18,7 +18,7 @@ function AccessDenied() {
       </svg>
       <div class="ml-3">
         <div class="font-bold text-left text-red-500">Access denied</div>
-        <div class="w-full text-gray-100 mt-1">
+        <div class="w-full text-slate-100 mt-1">
           You don&#x27;t have access to this page.
         </div>
       </div>

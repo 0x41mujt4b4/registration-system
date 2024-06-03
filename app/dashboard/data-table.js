@@ -30,7 +30,7 @@ export default function DataTable({table, columns, innerRef}) {
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="bg-sky-300 text-black sticky top-0">
+                  <TableHead key={header.id} className="bg-slate-400 text-black sticky top-0">
                     {header.isPlaceholder
                       ? null
                       : flexRender(

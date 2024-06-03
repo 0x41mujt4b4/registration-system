@@ -103,7 +103,7 @@ export default function DataTableDemo() {
   
 
   return (
-    <div className="flex flex-col w-full h-full px-4">
+    <div className="flex flex-col w-full h-full px-4 bg-slate-200 border-t border-slate-300">
       <div className="flex items-center py-2">
         <Input
           placeholder="Search..."
@@ -139,7 +139,7 @@ export default function DataTableDemo() {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline" className="ml-2 active:bg-gray-400" onClick={() => handleExport()}>
+        <Button variant="outline" className="ml-2 active:bg-slate-400" onClick={() => handleExport()}>
           Export
         </Button>
       </div>

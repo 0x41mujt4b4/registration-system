@@ -22,11 +22,11 @@ export default function ModalSuccess({open, setOpen}) {
                 />
               </svg>
             </div>
-            <Dialog.Title className="text-lg font-medium text-gray-800 text-center mt-3">
+            <Dialog.Title className="text-lg font-medium text-slate-800 text-center mt-3">
               {" "}
               Successfully Registered!
             </Dialog.Title>
-            <Dialog.Description className="mt-1 text-sm leading-relaxed text-center text-gray-500">
+            <Dialog.Description className="mt-1 text-sm leading-relaxed text-center text-slate-500">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua. Nunc
               eget lorem dolor sed viverra ipsum nunc. Consequat id porta nibh

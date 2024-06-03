@@ -16,8 +16,8 @@ export default function Navbar() {
   const session = useSession();
   // Replace  paths with your paths
   const navigation = [
-    { title: "Registration", path: "/registration" },
-    { title: "Dashboard", path: "/dashboard" },
+    { title: "Registration".toUpperCase(), path: "/registration" },
+    { title: "Dashboard".toUpperCase(), path: "/dashboard" },
     // { title: "Customers", path: "" },
     // { title: "Pricing", path: "" }
   ];
@@ -25,14 +25,14 @@ export default function Navbar() {
   // const cookies = new Cookies();
   // const router = useRouter()
   return (
-    <nav className="bg-sky-300 border-b w-full md:static md:text-sm md:border-none mb-4">
+    <nav className="bg-slate-200 border-b border-slate-300 w-full md:static md:text-sm mb-4">
       <div className="flex px-4 mx-auto justify-between">
         <div className="flex items-center justify-between py-3 md:py-2 md:block">
           <a href="/">
             <img
               src="/vision_logo.png"
               alt="vision logo"
-              className="h-auto w-10" />
+              className="h-auto w-10 mx-2" />
           </a>
         </div>
         <div
@@ -41,14 +41,14 @@ export default function Navbar() {
           <ul className="items-center flex space-x-6">
             {navigation.map((item, idx) => {
               return (
-                <li key={idx} className="text-white hover:text-sky-600">
+                <li key={idx} className="text-purple-950 font-bold hover:text-sky-600">
                   <a href={item.path} className="block">
                     {item.title}
                   </a>
                 </li>
               );
             })}
-            {session.status === 'loading' ? '' : <span className="hidden w-px h-6 bg-white md:block"></span>}
+            {session.status === 'loading' ? '' : <span className="hidden w-px h-6 bg-purple-950 md:block"></span>}
             <div className="items-center flex">
               {session.status === 'loading' ? '' : session.data ? (
                     <Logout />

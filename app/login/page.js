@@ -45,7 +45,7 @@ export default function Login() {
     <main className="w-full flex flex-col items-center justify-center px-4">
     {
       session.status === 'authenticated' ? router.push('/') :
-      <div className="max-w-md w-full bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg py-8 px-16">
+      <div className="max-w-md w-full bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-md rounded-2xl py-8 px-16">
         <div className="flex flex-col items-center">
         <img
               src="/vision_logo.png"
@@ -64,7 +64,7 @@ export default function Login() {
           className="mt-8 space-y-5"
         >
           <div>
-            <label className="font-medium text-white">Username</label>
+            <label className="font-medium text-black">Username</label>
             <input
               name="username"
               type="text"
@@ -74,7 +74,7 @@ export default function Login() {
             />
           </div>
           <div>
-            <label className="font-medium text-white">Password</label>
+            <label className="font-medium text-black">Password</label>
             <input
               name="password"
               type="password"
@@ -84,7 +84,7 @@ export default function Login() {
             />
           </div>
           <button disabled={isLoading} className={`w-full px-4 py-2 text-white font-medium bg-sky-600 hover:bg-sky-500 active:bg-sky-600 rounded-lg duration-150 ${isLoading ? 'px-4 py-2 text-white active:bg-sky-300 bg-sky-300 rounded-lg hover:bg-sky-300 cursor-not-allowed' : ''}`}>
-            {isLoading ? <span className="flex items-center justify-center"><Spinner size="3" className="text-white"
+            {isLoading ? <span className="flex items-center justify-center"><Spinner size="3" className="text-white animate-spin"
       /></span>: 'Sign in'}
           </button>
           {loginError && <Error title={'Login failed: '} message={loginError} setMessage={setLoginError}/>}

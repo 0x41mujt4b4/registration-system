@@ -61,9 +61,10 @@
       background-image: url('/vision_background.png');
       background-size: cover;
       background-position: center;
+      /* @apply bg-white */
       /* mix-blend-mode: overlay; */
       /* background-color: rgb(49, 62, 73); */
-      background-color: rgb(39, 156, 191);
+      /* background-color: rgb(39, 156, 191); */
       /* @apply bg-background text-foreground; */
     }
   }

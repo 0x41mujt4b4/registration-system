@@ -70,9 +70,9 @@ export default function RegistrationPage() {
     <div className="container mx-auto">
       <ModalSuccess open={open} setOpen={setOpen}/>
       
-      {/* <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-gray-200 md:text-5xl">VISION CENTER</h1> */}
-      {/* <h2  className="font-serif text-gray-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2> */}
-      <div className="bg bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-10">
+      {/* <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-slate-200 md:text-5xl">VISION CENTER</h1> */}
+      {/* <h2  className="font-serif text-slate-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2> */}
+      <div className="bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-10">
       <img
               src="/vision_logo.png"
               alt="vision logo"
@@ -125,7 +125,7 @@ export default function RegistrationPage() {
         />
         <div className="space-x-4 lg:px-12 col-start-3 justify-self-end self-end ">
           <Button
-          className="text-sm text-white duration-150 bg-red-600 rounded-lg hover:bg-red-500 active:bg-red-700"
+          className="text-sm text-white duration-150 bg-red-600 rounded-lg hover:bg-white hover:text-red-600 active:bg-red-600 active:text-white"
           type="button"
             onClick={() => {
               setName("");
@@ -140,7 +140,7 @@ export default function RegistrationPage() {
             Clear
           </Button>
           <Button
-          className="text-sm text-white duration-150 bg-sky-600 rounded-lg hover:bg-sky-500 active:bg-sky-700"
+          className="text-sm text-white duration-150 bg-sky-600 rounded-lg hover:bg-white hover:text-sky-600 active:bg-sky-600 active:text-white"
             type="submit"
           >
             Save & Print
@@ -155,7 +155,7 @@ export default function RegistrationPage() {
 // function InputField({ id, label, type, value, defaultValue, onChange }) {
 //     return (
 //       <div className="mb-4 col-span-1">
-//         <label htmlFor={id} className="block font-bold mb-2 text-gray-100">
+//         <label htmlFor={id} className="block font-bold mb-2 text-slate-100">
 //           {label}:
 //         </label>
 //         <input
@@ -173,7 +173,7 @@ export default function RegistrationPage() {
   // function SelectField({ id, label, options, onChange }) {
   //   return (
   //     <div className="mb-4 col-span-1">
-  //       <label htmlFor={id} className="block font-bold mb-2 text-gray-100">
+  //       <label htmlFor={id} className="block font-bold mb-2 text-slate-100">
   //         {label}:
   //       </label>
   //       <select
