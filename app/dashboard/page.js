@@ -73,14 +73,19 @@ export default function DataTableDemo() {
 
   const handleExport = () => {
     console.log("Exporting data...");
-    // generate a worksheet
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    // create a workbook
-    const workbook = XLSX.utils.book_new();
-    // add worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, "students_report");
-    // write to XLSX
-    XLSX.writeFileXLSX(workbook, "students_report.xlsx");
+
+    /* Create worksheet from HTML DOM TABLE */
+    const wb = XLSX.utils.table_to_book(tbl.current);
+    /* Export to file (start a download) */
+    XLSX.writeFile(wb, "students_report.xlsx");
+    // // generate a worksheet
+    // const worksheet = XLSX.utils.json_to_sheet(data);
+    // // create a workbook
+    // const workbook = XLSX.utils.book_new();
+    // // add worksheet to workbook
+    // XLSX.utils.book_append_sheet(workbook, worksheet, "students_report");
+    // // write to XLSX
+    // XLSX.writeFileXLSX(workbook, "students_report.xlsx");
   }
   const table = useReactTable({
     data,

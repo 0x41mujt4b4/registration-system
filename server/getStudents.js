@@ -13,13 +13,15 @@ export default async function getStudents() {
                 courses.course_level AS level,
                 courses.session_time AS time,
                 Fees.fees_type AS fees_type,
-                Fees.amount AS amount
+                Fees.amount AS amount,
+                Fees.payment_date AS payment_date
             FROM 
                 students
             LEFT JOIN 
                 courses ON students.id = courses.student_id
             LEFT JOIN 
-                Fees ON students.id = Fees.student_id;`;
+                Fees ON students.id = Fees.student_id
+            ORDER BY level ASC, payment_date;`;
     const [rows] = await connection.execute(query);
     // console.log("rows: ", rows);
     return rows;

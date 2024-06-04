@@ -34,7 +34,7 @@ export default function Columns({isLoading}) {
       </Button>
     ),
     cell: ({ row }) => isLoading ? <Skeleton /> : <div className="lowercase ml-6">{row.getValue("id")}</div>,
-    enableSorting: false,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -86,7 +86,7 @@ export default function Columns({isLoading}) {
   },
   {
     accessorKey: "fees_type",
-    header: isLoading ? <Skeleton /> : "Fees_Type",
+    header: isLoading ? <Skeleton /> : "Fees-Type",
     cell: ({ row }) => (
       isLoading ? <Skeleton /> : 
       <div className="capitalize">{row.getValue("fees_type")}</div>
@@ -102,46 +102,66 @@ export default function Columns({isLoading}) {
       const amount = parseFloat(row.getValue("amount"));
 
       // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("en-EG", {
         style: "currency",
-        currency: "USD",
+        currency: "EGP",
       }).format(amount);
 
       return <div className="text-right">{formatted}</div>;
     },
   },
   {
-    header: isLoading ? <Skeleton /> : '',
-    id: "actions",
-    enableHiding: false,
+    accessorKey: "payment_date",
+    header: isLoading ? <Skeleton /> : "Payment-Date",
     cell: ({ row }) => {
       if (isLoading) {
         return <Skeleton />;
       }
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      let formatter = new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      let date = row.getValue("payment_date");
+      let formattedDate = formatter.format(date).replace(/\//g, '-'); 
+      return <div className="capitalize">{formattedDate}</div>;
     },
   },
+  // {
+  //   header: isLoading ? <Skeleton /> : '',
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => {
+  //     if (isLoading) {
+  //       return <Skeleton />;
+  //     }
+  //     const payment = row.original;
+
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <DotsHorizontalIcon className="h-4 w-4" />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //           <DropdownMenuItem
+  //             onClick={() => navigator.clipboard.writeText(payment.id)}
+  //           >
+  //             Copy payment ID
+  //           </DropdownMenuItem>
+  //           <DropdownMenuSeparator />
+  //           <DropdownMenuItem>View customer</DropdownMenuItem>
+  //           <DropdownMenuItem>View payment details</DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     );
+  //   },
+  // },
 ])
 }
