@@ -27,6 +27,9 @@ export const options = {
     pages: {
         signIn: "/login",
     },
+    session: {
+        maxAge: 60 * 60, // 1 hour
+    },
     callbacks: {
         async jwt({ token, user}) {
             if(user){
