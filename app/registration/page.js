@@ -1,16 +1,20 @@
 "use client";
-import React, { useState } from "react";
+import {useRef, useState, useEffect } from "react";
 import InputField from "../components/InputField";
 import SelectField from "../components/SelectField";
 import { Button } from "@/components/ui/button";
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import ModalSuccess from "../components/ModalSuccess";
 import getStudents from "@/server/getStudents";
 import { date } from "zod";
 import addStudent from "@/server/addStudent";
 import addCourse from "@/server/addCourse";
 import addFees from "@/server/addFees";
-
+import ReactToPrint from 'react-to-print';
+import Receipt from "../components/Receipt";
+import { useReactToPrint } from 'react-to-print';
+import { useSession } from "next-auth/react";
+import html2pdf from 'html2pdf.js';
 
 export default function RegistrationPage() {
   const [name, setName] = useState("");
@@ -20,24 +24,58 @@ export default function RegistrationPage() {
   const [time, setTime] = useState("");
   const [feesType, setFeesType] = useState("");
   const [feesAmount, setFeesAmount] = useState(1600);
+  const [date, setDate] = useState(new Date().toLocaleDateString());
+  const [studentId, setStudentId] = useState(null);
+  const { data: sessionData, status } = useSession()
 
   const sessionOptions = ["Regular", "Mid-month"];
   const courseOptions = ["Communication", "Ilets", "English club", "Esp"];
   const levelOptions = ["Pre1", "Pre2", "Level-1", "Level-2", "Level-3", "Level-4", "Level-5", "Level-6", "Level-7", "Level-8"];
-  const timeOptions = ["11:00 ~ 1:00", "1:00 ~ 3:00", "3:00 ~ 5:00", "5:00 ~ 7:00", "None"];
+  const timeOptions = ["11:00 - 01:00", "01:00 - 03:00", "03:00 - 05:00", "05:00 - 07:00"];
   const feesTypeOptions = ["Register-fees", "Course-fees", "Repeat-fees"];
-  // const router = useRouter();
-  const [open, setOpen] = React.useState(false);
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const receiptRef = useRef();
+  const formData = {
+    name,
+    session,
+    course,
+    level,
+    time,
+    feesType,
+    feesAmount,
+    date,
+    studentId
+  };
+  const handlePrint = useReactToPrint({
+    content: () => receiptRef.current,
+  });
+
+  const handleSave = async () => {
+      console.log(receiptRef.current)
+      if (document) {
+        			await html2pdf().from(receiptRef.current).save();
+        		}
+  }
+
+  useEffect(() => {
+    console.log(status);
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       // add student to the database then use the student id to add course & fees
       const student_id = await addStudent({ name, date: new Date() });
+      setStudentId(student_id);
       await addCourse({ student_id, course_name: course, course_level: level, session_type: session, session_time: time });
       await addFees({ student_id, fees_type: feesType, amount: feesAmount, date: new Date()});
-      // console.log("fees: ", feesType, feesAmount);
-      
+      handlePrint();
+      handleSave();
+  
     } catch (error) {
       console.log("Error adding student", error);
     }
@@ -52,6 +90,7 @@ export default function RegistrationPage() {
     //   feesAmount
     // })
     // Force refresh the page
+
     setName("");
     setSession("");
     setCourse("");
@@ -59,9 +98,7 @@ export default function RegistrationPage() {
     setTime("");
     setFeesType("");
     setFeesAmount(1600);
-    // const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));
-    // wait().then(() => setOpen(true));
-    setOpen(true);
+    // setOpen(true);
     
     // router.push('/registration/print');
   };
@@ -147,6 +184,9 @@ export default function RegistrationPage() {
           </Button>
         </div>
       </form>
+      <div style={{ display: 'none' }}>
+        <Receipt ref={receiptRef} formData={formData} />
+      </div>
       </div>
     </div>
   );
