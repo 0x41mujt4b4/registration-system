@@ -1,9 +1,4 @@
 "use client";
-// import React from 'react';
-// import { redirect } from 'next/navigation';
-// import { cookies } from 'next/headers';
-// import { NextResponse } from 'next/server';
-// import getUser from '@/server/getUser';
 import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -14,37 +9,43 @@ import { useSession } from "next-auth/react";
 import Loading from "../components/loading";
 
 export default function Login() {
-  const session = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [isLoading , setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState(null);
-  
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/');
+    }
+  }, [status]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.target);
-    const response = await signIn("credentials", {
-      username: formData.get("username"),
-      password: formData.get("password"),
-      redirect: false,
-    });
-    if (response.ok) {
-      // redirect('/dashboard');
-      router.push("/dashboard");
-      router.refresh();
-      console.log("response: ", response);
-    }
-    else {
+    try 
+    {
+      const response = await signIn("credentials", {
+        username: formData.get("username"),
+        password: formData.get("password"),
+        redirect: false,
+      });
+      if (response.ok) {
+        router.push("/dashboard");
+      }
+      else {
+        setIsLoading(false);
+        setLoginError('wrong username or password. Please try again.');
+      }
+    } catch (error) {
       setIsLoading(false);
-      setLoginError('wrong username or password. Please try again.');
+      setLoginError('An error occurred. Please try again.');
     }
   };
 
-  // const [state, formAction] = useFormState(checkUser, initialState);
   return (
     <main className="w-full flex flex-col items-center justify-center px-4">
-    {
-      session.status === 'authenticated' ? router.push('/') :
       <div className="max-w-md w-full bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-md rounded-2xl py-8 px-16">
         <div className="flex flex-col items-center">
         <img
@@ -93,7 +94,6 @@ export default function Login() {
                   </div> */}
         </form>
       </div>
-}
     </main>
   );
 }

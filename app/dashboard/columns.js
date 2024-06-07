@@ -55,7 +55,17 @@ export default function Columns({isLoading}) {
   },
   {
     accessorKey: "session",
-    header: isLoading ? <Skeleton /> : "Session",
+    header: ({ column }) => {
+      return (
+        isLoading ? <Skeleton /> :
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Session
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> :
       <div className="capitalize ">{row.getValue("session")}</div>
@@ -63,14 +73,34 @@ export default function Columns({isLoading}) {
   },
   {
     accessorKey: "course",
-    header: isLoading ? <Skeleton /> : "Course",
+    header: ({ column }) => {
+      return (
+        isLoading ? <Skeleton /> :
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Course
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );},
     cell: ({ row }) => (isLoading ? <Skeleton /> : 
       <div className="capitalize">{row.getValue("course")}</div>
     ),
   },
   {
     accessorKey: "level",
-    header: isLoading ? <Skeleton /> : "Level",
+    header: ({ column }) => {
+      return (
+        isLoading ? <Skeleton /> :
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Level
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> :
       <div className="capitalize">{row.getValue("level")}</div>
@@ -78,7 +108,17 @@ export default function Columns({isLoading}) {
   },
   {
     accessorKey: "time",
-    header: isLoading ? <Skeleton /> : "Time",
+    header: ({ column }) => {
+      return (
+        isLoading ? <Skeleton /> :
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Time
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> : 
       <div className="capitalize">{row.getValue("time")}</div>
@@ -86,7 +126,17 @@ export default function Columns({isLoading}) {
   },
   {
     accessorKey: "fees_type",
-    header: isLoading ? <Skeleton /> : "Fees-Type",
+    header: ({ column }) => {
+      return (
+        isLoading ? <Skeleton /> :
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Fees-Type
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> : 
       <div className="capitalize">{row.getValue("fees_type")}</div>
@@ -94,7 +144,17 @@ export default function Columns({isLoading}) {
   },
   {
     accessorKey: "amount",
-    header: () => isLoading ? <Skeleton /> : <div className="text-right">Amount</div>,
+    header: ({ column }) => {
+      return (
+        isLoading ? <Skeleton /> :
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );},
     cell: ({ row }) => {
       if (isLoading) {
         return <Skeleton />;
@@ -107,12 +167,22 @@ export default function Columns({isLoading}) {
         currency: "EGP",
       }).format(amount);
 
-      return <div className="text-right">{formatted}</div>;
+      return <div className="">{formatted}</div>;
     },
   },
   {
     accessorKey: "payment_date",
-    header: isLoading ? <Skeleton /> : "Payment-Date",
+    header: ({ column }) => {
+      return (
+        isLoading ? <Skeleton /> :
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Payment-Date
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );},
     cell: ({ row }) => {
       if (isLoading) {
         return <Skeleton />;

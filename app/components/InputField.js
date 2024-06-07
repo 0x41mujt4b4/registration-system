@@ -19,7 +19,7 @@ export default function InputField({ id, label, type, value, defaultValue, onCha
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 defaultValue = {defaultValue}
-                className="w-full pl-12 pr-3 py-2 text-black outline-none border focus:border-indigo-600 shadow-sm rounded-lg font-serif"
+                className="w-full pl-12 pr-3 py-2 text-black outline-none border focus:border-sky-600 shadow-sm rounded-lg font-serif"
             />
         </div>
     )

@@ -46,7 +46,8 @@ import { get } from "http";
 import getStudents from "@/server/getStudents";
 import { set } from "zod";
 import * as XLSX from "xlsx";
-
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function DataTableDemo() {
   const tbl = useRef(null)
@@ -57,6 +58,16 @@ export default function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] = useState({})
   const [rowSelection, setRowSelection] = useState({})
   const columns = Columns({isLoading})
+  const { data: sessionData, status } = useSession()
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log(status);
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status]);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -112,9 +123,9 @@ export default function DataTableDemo() {
       <div className="flex items-center py-2">
         <Input
           placeholder="Search..."
-          value={(table.getColumn("name").getFilterValue()) ?? ""}
+          value={(table.getColumn("level").getFilterValue()) ?? ""}
           onChange={(event) =>
-            table.getColumn("name").setFilterValue(event.target.value)
+            table.getColumn("level").setFilterValue(event.target.value)
           }
           className="bg-white max-w-sm"
         />

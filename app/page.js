@@ -9,7 +9,7 @@ export default async function Page() {
   return (
     <main className="">
       {
-      session ? <Dashboard /> : <Loading />
+      !session ? <Loading /> : <Dashboard />
       }
     </main>
   );
