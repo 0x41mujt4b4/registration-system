@@ -14,7 +14,10 @@ import ReactToPrint from 'react-to-print';
 import Receipt from "../components/Receipt";
 import { useReactToPrint } from 'react-to-print';
 import { useSession } from "next-auth/react";
-import html2pdf from 'html2pdf.js';
+let html2pdf;
+if (typeof window !== 'undefined') {
+  html2pdf = require('html2pdf.js');
+}
 
 export default function RegistrationPage() {
   const [name, setName] = useState("");
