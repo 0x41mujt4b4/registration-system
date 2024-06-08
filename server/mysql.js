@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 
 let db;
 
-async function connectToDatabase() {
+export default async function connectToDatabase() {
   if (!db) {
     db = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -23,4 +23,18 @@ connectToDatabase().catch(error => {
   console.log("error connecting to MYSQL-Database: " + error.stack);
 });
 
-module.exports = connectToDatabase;
+// creaet query function
+export async function query(sql, params=[]) {
+  const connection = await connectToDatabase();
+  const [results] = await connection.execute(sql, params);
+
+  return results;
+}
+
+// add end connect function to use it when signout
+export async function endConnection() {
+  if (db) {
+    await db.end();
+    console.log('Disconnected from MYSQL-Database');
+  }
+}
