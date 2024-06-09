@@ -1,11 +1,9 @@
 "use server";
-import db from "@/server/mysql";
+import {query} from "@/server/mysql";
 
 export default async function getStudents() {
   try {
-    const connection = await db();
-    // get all students and thier courses and fees from database
-    const query = `SELECT 
+    const sql = `SELECT 
                 students.id AS id,
                 students.name AS name,
                 courses.session_type AS session,
@@ -22,11 +20,10 @@ export default async function getStudents() {
             LEFT JOIN 
                 Fees ON students.id = Fees.student_id
             ORDER BY level ASC, payment_date;`;
-    const [rows] = await connection.execute(query);
-    // console.log("rows: ", rows);
-    return rows;
+    const results = await query(sql);
+    return results;
   } catch (error) {
-    console.error("Failed to fetch user:", error);
-    // throw new Error('Failed to fetch user.');
+    console.error("Failed to fetch students:", error);
+    throw error;
   }
 }
