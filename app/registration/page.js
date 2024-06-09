@@ -4,7 +4,7 @@ import InputField from "../components/InputField";
 import SelectField from "../components/SelectField";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import ModalSuccess from "../components/ModalSuccess";
+import ModalError from "../components/ModalError";
 import getStudents from "@/server/getStudents";
 import { date } from "zod";
 import addStudent from "@/server/addStudent";
@@ -87,6 +87,11 @@ export default function RegistrationPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!name || !feesType || !feesAmount)
+      {
+        alert("Please Enter Name, Fees Type and Fees Amount.");
+        return;
+      }
     try {
       // add student to the database then use the student id to add course & fees
       const student_id = await addStudent({ name, date: new Date() });
@@ -107,6 +112,7 @@ export default function RegistrationPage() {
       handlePrint();
       handleSave();
     } catch (error) {
+      setOpen(true);
       console.log("Error adding student", error);
     }
     // print the registration form
@@ -135,7 +141,7 @@ export default function RegistrationPage() {
 
   return (
     <div className="container mx-auto">
-      <ModalSuccess open={open} setOpen={setOpen} />
+      <ModalError open={open} setOpen={setOpen} />
 
       {/* <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-slate-200 md:text-5xl">VISION CENTER</h1> */}
       {/* <h2  className="font-serif text-slate-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2> */}
