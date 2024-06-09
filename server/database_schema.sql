@@ -15,7 +15,7 @@ CREATE TABLE Courses (
     course_level VARCHAR(50),
     session_type VARCHAR(50),
     session_time VARCHAR(50),
-    FOREIGN KEY (student_id) REFERENCES Students(id)
+    FOREIGN KEY (student_id) REFERENCES Students(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Fees (
@@ -24,5 +24,5 @@ CREATE TABLE Fees (
     fees_type VARCHAR(50),
     amount DECIMAL(10, 2),
     payment_date DATETIME,
-    FOREIGN KEY (student_id) REFERENCES Students(id)
+    FOREIGN KEY (student_id) REFERENCES Students(id) ON DELETE CASCADE
 );
