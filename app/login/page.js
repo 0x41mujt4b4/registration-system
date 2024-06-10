@@ -11,12 +11,12 @@ import Loading from "../components/loading";
 export default function Login() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isLoading , setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState(null);
 
   useEffect(() => {
-    if (status === 'authenticated') {
-      router.push('/');
+    if (status === "authenticated") {
+      router.push("/");
     }
   }, [status]);
 
@@ -24,8 +24,7 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.target);
-    try 
-    {
+    try {
       const response = await signIn("credentials", {
         username: formData.get("username"),
         password: formData.get("password"),
@@ -33,25 +32,26 @@ export default function Login() {
       });
       if (response.ok) {
         router.push("/dashboard");
-      }
-      else {
+      } else {
         setIsLoading(false);
-        setLoginError('wrong username or password. Please try again.');
+        setLoginError("wrong username or password. Please try again.");
       }
     } catch (error) {
       setIsLoading(false);
-      setLoginError('An error occurred. Please try again.');
+      setLoginError("An error occurred. Please try again.");
     }
   };
 
   return (
     <main className="w-full flex flex-col items-center justify-center px-4">
-      <div className="max-w-md w-full bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-md rounded-2xl py-8 px-16">
+      <div className="max-w-xl w-full bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-2xl py-11 px-16">
         <div className="flex flex-col items-center">
-        <img
-              src="/vision_logo.png"
-              alt="vision logo"
-              className="mx-auto h-28 w-auto" />
+          {/* eslint-disable */}
+          <img
+            src="/vision_logo.png"
+            alt="vision logo"
+            className="mx-auto h-28 w-auto"
+          />
           {/* <div className="mt-5 space-y-2">
             <h3 className="text-white text-2xl font-bold sm:text-3xl">
               Vision Center System
@@ -84,11 +84,29 @@ export default function Login() {
               className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-sky-600 shadow-sm rounded-lg"
             />
           </div>
-          <button disabled={isLoading} className={`w-full px-4 py-2 text-white font-medium bg-sky-600 hover:bg-sky-500 active:bg-sky-600 rounded-lg duration-150 ${isLoading ? 'px-4 py-2 text-white active:bg-sky-300 bg-sky-300 rounded-lg hover:bg-sky-300 cursor-not-allowed' : ''}`}>
-            {isLoading ? <span className="flex items-center justify-center"><Spinner size="3" className="text-white animate-spin"
-      /></span>: 'Sign in'}
+          <button
+            disabled={isLoading}
+            className={`w-full px-4 py-2 text-white font-medium bg-sky-600 hover:bg-sky-500 active:bg-sky-600 rounded-lg duration-150 ${
+              isLoading
+                ? "px-4 py-2 text-white active:bg-sky-300 bg-sky-300 rounded-lg hover:bg-sky-300 cursor-not-allowed"
+                : ""
+            }`}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <Spinner size="3" className="text-white animate-spin py-3" />
+              </span>
+            ) : (
+              "Sign in"
+            )}
           </button>
-          {loginError && <Error title={'Login failed: '} message={loginError} setMessage={setLoginError}/>}
+          {loginError && (
+            <Error
+              title={"Login failed: "}
+              message={loginError}
+              setMessage={setLoginError}
+            />
+          )}
           {/* <div className="text-center">
                       <a href="javascript:void(0)" className="hover:text-sky-600">Forgot password?</a>
                   </div> */}

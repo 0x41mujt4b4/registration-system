@@ -30,7 +30,7 @@ export default function Columns({isLoading}) {
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         ID
-        <CaretSortIcon className="ml-2 h-4 w-4" />
+        <CaretSortIcon className="text-center size-4" />
       </Button>
     ),
     cell: ({ row }) => isLoading ? <Skeleton /> : <div className="lowercase ml-6">{row.getValue("id")}</div>,
@@ -68,7 +68,7 @@ export default function Columns({isLoading}) {
       );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> :
-      <div className="capitalize ">{row.getValue("session")}</div>
+      <div className="capitalize text-center ">{row.getValue("session")}</div>
     ),
   },
   {
@@ -85,7 +85,7 @@ export default function Columns({isLoading}) {
         </Button>
       );},
     cell: ({ row }) => (isLoading ? <Skeleton /> : 
-      <div className="capitalize">{row.getValue("course")}</div>
+      <div className="capitalize text-center">{row.getValue("course")}</div>
     ),
   },
   {
@@ -103,7 +103,7 @@ export default function Columns({isLoading}) {
       );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> :
-      <div className="capitalize">{row.getValue("level")}</div>
+      <div className="capitalize text-center">{row.getValue("level")}</div>
     ),
   },
   {
@@ -121,7 +121,7 @@ export default function Columns({isLoading}) {
       );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> : 
-      <div className="capitalize">{row.getValue("time")}</div>
+      <div className="capitalize text-center">{row.getValue("time")}</div>
     ),
   },
   {
@@ -139,7 +139,7 @@ export default function Columns({isLoading}) {
       );},
     cell: ({ row }) => (
       isLoading ? <Skeleton /> : 
-      <div className="capitalize">{row.getValue("fees_type")}</div>
+      <div className="capitalize text-center">{row.getValue("fees_type")}</div>
     ),
   },
   {
@@ -167,7 +167,7 @@ export default function Columns({isLoading}) {
         currency: "EGP",
       }).format(amount);
 
-      return <div className="">{formatted}</div>;
+      return <div className="text-center">{formatted}</div>;
     },
   },
   {
@@ -197,7 +197,7 @@ export default function Columns({isLoading}) {
       });
       let date = row.getValue("payment_date");
       let formattedDate = formatter.format(date).replace(/\//g, '-'); 
-      return <div className="capitalize">{formattedDate}</div>;
+      return <div className="capitalize text-center">{formattedDate}</div>;
     },
   },
   // {

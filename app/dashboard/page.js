@@ -52,7 +52,7 @@ import { useRouter } from "next/navigation";
 export default function DataTableDemo() {
   const tbl = useRef(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [data, setData] = useState(Array(8).fill({}))
+  const [data, setData] = useState(Array(10).fill({}))
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
@@ -159,7 +159,7 @@ export default function DataTableDemo() {
           Export
         </Button>
       </div>
-      <div className="flex bg-white h-[28rem]">
+      <div className="flex bg-white h-[37rem]">
       <DataTable table={table} columns={columns} innerRef={tbl}/>
       </div>
       {/* <DataTablePagination table={table}/> */}

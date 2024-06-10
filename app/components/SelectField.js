@@ -5,9 +5,9 @@ export default function SelectField({ id, label, options, placeholder, value, on
 
   return (
       <Select.Root value={value} onValueChange={onChange}>
-        <div className={`w-64 max-w-xs ${className}`}>
-        <label htmlFor={id} className="block uppercase tracking-wide text-black text-xs font-bold mb-2">{label}</label>
-          <Select.Trigger className="w-full inline-flex items-center justify-between px-3 py-2 text-sm text-black bg-white border rounded-lg shadow-sm outline-none focus:ring-offset-1 focus:ring-sky-600 focus:ring-1">
+        <div className={`w-96 max-w-xs ${className}`}>
+        <label htmlFor={id} className="block uppercase tracking-wide text-black text-sm font-bold mb-2">{label}</label>
+          <Select.Trigger className="w-full inline-flex items-center justify-between p-3 text-black bg-white border rounded-lg shadow-sm outline-none focus:ring-offset-1 focus:ring-sky-600 focus:ring-1">
             <Select.Value placeholder={placeholder} />
             <Select.Icon className="text-slate-400">
               <svg
@@ -30,7 +30,7 @@ export default function SelectField({ id, label, options, placeholder, value, on
             <Select.Content
               position="popper"
               avoidCollisions={false}
-              className="w-[var(--radix-select-trigger-width)] mt-3 overflow-y-auto bg-white border rounded-lg shadow-sm text-sm h-36"
+              className="w-[var(--radix-select-trigger-width)] mt-3 overflow-y-auto bg-white border rounded-lg shadow-sm h-40"
             >
               <Select.Viewport className="">
               {options.map((option, index) => (

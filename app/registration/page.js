@@ -145,12 +145,12 @@ export default function RegistrationPage() {
 
       {/* <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-slate-200 md:text-5xl">VISION CENTER</h1> */}
       {/* <h2  className="font-serif text-slate-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2> */}
-      <div className="bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-10">
+      <div className="bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-16">
         {/* eslint-disable */}
         <img
           src="/vision_logo.png"
           alt="vision logo"
-          className="mx-auto h-28 w-auto mb-2"
+          className="mx-auto h-28 w-auto mb-5"
         />
         <form
           onSubmit={handleSubmit}
@@ -205,11 +205,11 @@ export default function RegistrationPage() {
             options={feesTypeOptions}
             value={feesType}
             onChange={setFeesType}
-            className="px-1.5"
+            className=""
           />
-          <div className="space-x-4 lg:px-12 col-start-3 justify-self-end self-end ">
+          <div className="space-x-4 lg:px-10 col-start-3 justify-self-end self-end ">
             <Button
-              className="text-sm text-white duration-150 bg-red-600 rounded-lg hover:bg-white hover:text-red-600 active:bg-red-600 active:text-white"
+              className="text-md text-white duration-150 bg-red-600 rounded-lg hover:bg-white hover:text-red-600 active:bg-red-600 active:text-white"
               type="button"
               onClick={() => {
                 setName("");
@@ -224,7 +224,7 @@ export default function RegistrationPage() {
               Clear
             </Button>
             <Button
-              className="text-sm text-white duration-150 bg-sky-600 rounded-lg hover:bg-white hover:text-sky-600 active:bg-sky-600 active:text-white"
+              className="text-md text-white duration-150 bg-sky-600 rounded-lg hover:bg-white hover:text-sky-600 active:bg-sky-600 active:text-white"
               type="submit"
             >
               Save & Print
