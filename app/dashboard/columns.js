@@ -16,7 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@radix-ui/themes";
+// import { Skeleton } from "@radix-ui/themes";
+import Skeleton from '@mui/material/Skeleton';
 
 export default function Columns({isLoading}) {
   return (
@@ -24,7 +25,7 @@ export default function Columns({isLoading}) {
   {
     accessorKey: "id",
     header: ({ column }) => (
-      isLoading ? <Skeleton /> :
+      isLoading ? <Skeleton  animation="wave" height={30} /> :
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -33,7 +34,7 @@ export default function Columns({isLoading}) {
         <CaretSortIcon className="text-center size-4" />
       </Button>
     ),
-    cell: ({ row }) => isLoading ? <Skeleton /> : <div className="lowercase ml-6">{row.getValue("id")}</div>,
+    cell: ({ row }) => isLoading ? <Skeleton  animation="wave" height={30} /> : <div className="lowercase ml-6">{row.getValue("id")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -41,7 +42,7 @@ export default function Columns({isLoading}) {
     accessorKey: "name",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -51,13 +52,13 @@ export default function Columns({isLoading}) {
         </Button>
       );
     },
-    cell: ({ row }) => isLoading ? <Skeleton /> : <div className="font-serif font-medium text-lg">{row.getValue("name")}</div>,
+    cell: ({ row }) => isLoading ? <Skeleton  animation="wave" height={30} /> : <div className="font-serif font-medium text-lg">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "session",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -67,7 +68,7 @@ export default function Columns({isLoading}) {
         </Button>
       );},
     cell: ({ row }) => (
-      isLoading ? <Skeleton /> :
+      isLoading ? <Skeleton  animation="wave" height={30} /> :
       <div className="capitalize text-center ">{row.getValue("session")}</div>
     ),
   },
@@ -75,7 +76,7 @@ export default function Columns({isLoading}) {
     accessorKey: "course",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -84,7 +85,7 @@ export default function Columns({isLoading}) {
           <CaretSortIcon className="ml-2 h-4 w-4" />
         </Button>
       );},
-    cell: ({ row }) => (isLoading ? <Skeleton /> : 
+    cell: ({ row }) => (isLoading ? <Skeleton  animation="wave" height={30} /> : 
       <div className="capitalize text-center">{row.getValue("course")}</div>
     ),
   },
@@ -92,7 +93,7 @@ export default function Columns({isLoading}) {
     accessorKey: "level",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -102,7 +103,7 @@ export default function Columns({isLoading}) {
         </Button>
       );},
     cell: ({ row }) => (
-      isLoading ? <Skeleton /> :
+      isLoading ? <Skeleton  animation="wave" height={30} /> :
       <div className="capitalize text-center">{row.getValue("level")}</div>
     ),
   },
@@ -110,7 +111,7 @@ export default function Columns({isLoading}) {
     accessorKey: "time",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -120,7 +121,7 @@ export default function Columns({isLoading}) {
         </Button>
       );},
     cell: ({ row }) => (
-      isLoading ? <Skeleton /> : 
+      isLoading ? <Skeleton  animation="wave" height={30} /> : 
       <div className="capitalize text-center">{row.getValue("time")}</div>
     ),
   },
@@ -128,7 +129,7 @@ export default function Columns({isLoading}) {
     accessorKey: "fees_type",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -138,7 +139,7 @@ export default function Columns({isLoading}) {
         </Button>
       );},
     cell: ({ row }) => (
-      isLoading ? <Skeleton /> : 
+      isLoading ? <Skeleton  animation="wave" height={30} /> : 
       <div className="capitalize text-center">{row.getValue("fees_type")}</div>
     ),
   },
@@ -146,7 +147,7 @@ export default function Columns({isLoading}) {
     accessorKey: "amount",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -157,7 +158,7 @@ export default function Columns({isLoading}) {
       );},
     cell: ({ row }) => {
       if (isLoading) {
-        return <Skeleton />;
+        return <Skeleton  animation="wave" height={30} />;
       }
       const amount = parseFloat(row.getValue("amount"));
 
@@ -174,7 +175,7 @@ export default function Columns({isLoading}) {
     accessorKey: "payment_date",
     header: ({ column }) => {
       return (
-        isLoading ? <Skeleton /> :
+        isLoading ? <Skeleton  animation="wave" height={30} /> :
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -185,7 +186,7 @@ export default function Columns({isLoading}) {
       );},
     cell: ({ row }) => {
       if (isLoading) {
-        return <Skeleton />;
+        return <Skeleton  animation="wave" height={30} />;
       }
       let formatter = new Intl.DateTimeFormat('en-GB', {
         day: '2-digit',
@@ -201,7 +202,7 @@ export default function Columns({isLoading}) {
     },
   },
   // {
-  //   header: isLoading ? <Skeleton /> : '',
+  //   header: isLoading ? <Skeleton  animation="wave" height={30} /> : '',
   //   id: "actions",
   //   enableHiding: false,
   //   cell: ({ row }) => {
