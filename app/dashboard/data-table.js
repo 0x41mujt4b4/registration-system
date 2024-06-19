@@ -43,7 +43,7 @@ export default function DataTable({table, columns, innerRef}) {
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody className="h-96 overflow-y-auto">
+        <TableBody className="overflow-y-auto">
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
