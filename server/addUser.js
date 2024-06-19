@@ -1,10 +1,10 @@
 "use server";
-import query from '@/server/mysql';
+import {query} from '@/server/mysql';
 
 export default async function addUser(user) {
     try {
         // Insert the user into the database
-        const results = await query('INSERT INTO users (username, password) VALUES (?, ?)', [user.username, user.password]);
+        const results = await query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [user.username, user.password, user.role]);
 
         return results.insertId; // Return the ID of the inserted user
     } catch (error) {
