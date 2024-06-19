@@ -2,6 +2,13 @@ CREATE DATABASE IF NOT EXISTS vision_center;
 
 USE vision_center;
 
+CREATE TABLE Users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(100),
+    password VARCHAR(100),
+    role ENUM('admin', 'standard')
+);
+
 CREATE TABLE Students (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100),
