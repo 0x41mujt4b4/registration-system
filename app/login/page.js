@@ -18,6 +18,7 @@ export default function Login() {
     if (status === "authenticated") {
       router.push("/");
     }
+    // eslint-disable-next-line
   }, [status]);
 
   const handleLogin = async (e) => {
