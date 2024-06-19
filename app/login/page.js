@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-// import Spinner from "../components/Spinner";
-import { Spinner } from "@radix-ui/themes";
+import Spinner from "../components/Spinner";
+// import { Spinner } from "@radix-ui/themes";
 import Error from "../components/error";
 import { useSession } from "next-auth/react";
 import Loading from "../components/loading";
@@ -95,7 +95,7 @@ export default function Login() {
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
-                <Spinner size="3" className="text-white animate-spin py-3" />
+                <Spinner className="text-white animate-spin py-3" />
               </span>
             ) : (
               "Sign in"
