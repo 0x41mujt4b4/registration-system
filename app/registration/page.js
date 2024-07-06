@@ -73,7 +73,14 @@ export default function RegistrationPage() {
   const handleSave = async () => {
     console.log(receiptRef.current);
     if (document) {
-      await html2pdf().from(receiptRef.current).save();
+      const options = {
+        margin: 1,
+        filename: 'receipt.pdf',
+        image: { type: 'png', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      await html2pdf().set(options).from(receiptRef.current).save();
     }
   };
 
@@ -145,7 +152,7 @@ export default function RegistrationPage() {
 
       {/* <h1  className="font-serif text-center mb-2 text-4xl font-extrabold leading-none tracking-tight text-slate-200 md:text-5xl">VISION CENTER</h1> */}
       {/* <h2  className="font-serif text-slate-200 text-center text-2xl font-extrabold mb-4">REGISTRATION</h2> */}
-      <div className="bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-16">
+      <div className="bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-[7%]">
         {/* eslint-disable */}
         <img
           src="/vision_logo.png"
