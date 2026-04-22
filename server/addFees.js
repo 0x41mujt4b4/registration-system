@@ -1,13 +1,16 @@
-"use server";
-import {query} from '@/server/mysql';
+import connectToDatabase from '@/server/mongodb';
+import { ObjectId } from 'mongodb';
 
 export default async function addFees(fees) {
     try {
-        // Insert the fees into the database
-        const fees_query = 'INSERT INTO fees (student_id, fees_type, amount, payment_date) VALUES (?, ?, ?, ?)';
-        const results = await query(fees_query, [fees.student_id, fees.fees_type, fees.amount, fees.date]);
-
-        return results[0];
+        const db = await connectToDatabase();
+        const result = await db.collection('fees').insertOne({
+            student_id: new ObjectId(fees.student_id),
+            fees_type: fees.fees_type,
+            amount: fees.amount,
+            payment_date: fees.date
+        });
+        return result;
     } catch (error) {
         console.error('Error adding fees:', error);
         throw error;

@@ -42,8 +42,7 @@ import {
 import Columns from './columns';
 import DataTable from "./data-table";
 import DataTablePagination from "./DataTablePagination";
-import { get } from "http";
-import getStudents from "@/server/getStudents";
+import { fetchGraphQL } from "@/lib/graphql-client";
 import { set } from "zod";
 import * as XLSX from "xlsx";
 import { useSession } from "next-auth/react";
@@ -71,8 +70,22 @@ export default function DataTableDemo() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getStudents();
-        setData(result);
+        const result = await fetchGraphQL(`
+          query {
+            getStudents {
+              id
+              name
+              session
+              course
+              level
+              time
+              fees_type
+              amount
+              payment_date
+            }
+          }
+        `);
+        setData(result.getStudents);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);

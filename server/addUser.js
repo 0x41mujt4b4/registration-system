@@ -1,12 +1,14 @@
-"use server";
-import {query} from '@/server/mysql';
+import connectToDatabase from '@/server/mongodb';
 
 export default async function addUser(user) {
     try {
-        // Insert the user into the database
-        const results = await query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [user.username, user.password, user.role]);
-
-        return results.insertId; // Return the ID of the inserted user
+        const db = await connectToDatabase();
+        const result = await db.collection('users').insertOne({
+            username: user.username,
+            password: user.password,
+            role: user.role
+        });
+        return result.insertedId.toString(); // Return the ID of the inserted user
     } catch (error) {
         console.error('Error adding user:', error);
         throw error;

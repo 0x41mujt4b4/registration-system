@@ -1,18 +1,17 @@
-"use server";
-import {query} from '@/server/mysql';
+import connectToDatabase from '@/server/mongodb';
+import { ObjectId } from 'mongodb';
 
 export default async function addCourse(course) {
     try {
-        const courses_query = 'INSERT INTO courses (student_id, course_name, course_level, session_type, session_time) VALUES (?, ?, ?, ?, ?)';
-        // Insert student info into the database
-        const results = await query(courses_query, [
-          course.student_id,
-          course.course_name,
-          course.course_level,
-          course.session_type,
-          course.session_time,
-        ]);
-        return results[0];
+        const db = await connectToDatabase();
+        const result = await db.collection('courses').insertOne({
+            student_id: new ObjectId(course.student_id),
+            course_name: course.course_name,
+            course_level: course.course_level,
+            session_type: course.session_type,
+            session_time: course.session_time
+        });
+        return result;
     } catch (error) {
         console.error('Error adding course:', error);
         throw error;

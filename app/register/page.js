@@ -1,35 +1,34 @@
-import addUser from "@/server/addUser";
-import { NextResponse } from "next/server";
-import { hash } from "bcrypt";
+"use client";
 
-export default async function Register() {
+import { fetchGraphQL } from "@/lib/graphql-client";
+import { useRouter } from "next/navigation";
 
-    const handleRegister = async (formData) => {
-        "use server";
+export default function Register() {
+    const router = useRouter();
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
         const username = formData.get('username');
         const password = formData.get('password');
-        const hashedPassword = await hash(password, 10);
-        console.log("passwordLength: ", hashedPassword.length);
+        
         try {
-            const response = await addUser({ username, password: hashedPassword});
-            console.log("response: ", response);
+            const response = await fetchGraphQL(`
+                mutation AddUser($username: String!, $password: String!) {
+                    addUser(username: $username, password: $password)
+                }
+            `, { username, password });
+            console.log("User registered:", response.addUser);
+            router.push('/login');
         } catch (error) {
             console.error('Failed to register user:', error);
-            // return NextResponse.error('Failed to register user.', { status: 500 });
         }
-        // const response = await fetch('http://localhost:3000/api/auth/register', {
-        //     method: 'POST',
-        //     body: JSON.stringify({
-        //         username: formData.get('username'),
-        //         password: formData.get('password')
-        //     })
-        // });
     };
 
     return (
         <div>
             <h2>Register</h2>
-            <form action={handleRegister}>
+            <form onSubmit={handleRegister}>
                 <div>
                     <label htmlFor="username">Username:</label>
                     <input
@@ -50,4 +49,4 @@ export default async function Register() {
             </form>
         </div>
     );
-};
+}

@@ -5,11 +5,7 @@ import SelectField from "../components/SelectField";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import ModalError from "../components/ModalError";
-import getStudents from "@/server/getStudents";
-import { date } from "zod";
-import addStudent from "@/server/addStudent";
-import addCourse from "@/server/addCourse";
-import addFees from "@/server/addFees";
+import { fetchGraphQL } from "@/lib/graphql-client";
 import ReactToPrint from "react-to-print";
 import Receipt from "../components/Receipt";
 import { useReactToPrint } from "react-to-print";
@@ -101,20 +97,40 @@ export default function RegistrationPage() {
       }
     try {
       // add student to the database then use the student id to add course & fees
-      const student_id = await addStudent({ name, date: new Date() });
+      const addStudentResult = await fetchGraphQL(`
+        mutation AddStudent($name: String!, $date: String!) {
+          addStudent(name: $name, date: $date)
+        }
+      `, { name, date: new Date().toISOString() });
+      
+      const student_id = addStudentResult.addStudent;
       setStudentId(student_id);
-      await addCourse({
+
+      await fetchGraphQL(`
+        mutation AddCourse($student_id: ID!, $course_name: String, $course_level: String, $session_type: String, $session_time: String) {
+          addCourse(student_id: $student_id, course_name: $course_name, course_level: $course_level, session_type: $session_type, session_time: $session_time) {
+            id
+          }
+        }
+      `, {
         student_id,
         course_name: course,
         course_level: level,
         session_type: session,
         session_time: time,
       });
-      await addFees({
+
+      await fetchGraphQL(`
+        mutation AddFees($student_id: ID!, $fees_type: String, $amount: Float, $date: String!) {
+          addFees(student_id: $student_id, fees_type: $fees_type, amount: $amount, date: $date) {
+            id
+          }
+        }
+      `, {
         student_id,
         fees_type: feesType,
-        amount: feesAmount,
-        date: new Date(),
+        amount: parseFloat(feesAmount),
+        date: new Date().toISOString(),
       });
       handlePrint();
       handleSave();
