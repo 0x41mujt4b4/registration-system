@@ -13,7 +13,7 @@ export default function Login() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/");
+      router.push("/dashboard");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
@@ -31,6 +31,7 @@ export default function Login() {
       });
       if (response?.ok) {
         router.push("/dashboard");
+        router.refresh();
       } else {
         setIsLoading(false);
         setLoginError("Wrong username or password. Please try again.");
@@ -79,9 +80,8 @@ export default function Login() {
           )}
           <button
             disabled={isLoading}
-            className={`w-full px-4 py-2 text-white font-medium bg-sky-600 hover:bg-sky-500 active:bg-sky-600 rounded-lg duration-150 ${
-              isLoading ? "bg-sky-300 hover:bg-sky-300 cursor-not-allowed" : ""
-            }`}
+            className={`w-full px-4 py-2 text-white font-medium bg-sky-600 hover:bg-sky-500 active:bg-sky-600 rounded-lg duration-150 ${isLoading ? "bg-sky-300 hover:bg-sky-300 cursor-not-allowed" : ""
+              }`}
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </button>
