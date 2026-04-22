@@ -30,6 +30,7 @@ export const options = {
     session: {
         maxAge: 60 * 60, // 1 hour
     },
+    secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async jwt({ token, user}) {
             if(user){
