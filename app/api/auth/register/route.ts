@@ -1,17 +1,23 @@
 import { NextResponse } from "next/server";
-import { hash } from "bcrypt";
+import { z } from "zod";
 
-export async function POST(request) {
+const registerSchema = z.object({
+    username: z.string().min(3),
+    password: z.string().min(6),
+});
+
+export async function POST(request: Request) {
     try {
-        const { username, password } = await request.json();
-        if (!username || !password) {
-            return NextResponse.json({ error: 'Missing username or password.' }, { status: 400 });
+        const payload = registerSchema.safeParse(await request.json());
+        if (!payload.success) {
+            return NextResponse.json({ error: "Invalid username or password format." }, { status: 400 });
         }
-        console.log('Registering user: ', username, password);
-        // return NextResponse.redirect('/register');
+
+        const { username } = payload.data;
+        console.log("Registering user:", username);
+        return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Failed to register user:', error);
-        return NextResponse.json({ error: 'Failed to register user.' }, { status: 500 });
+        console.error("Failed to register user:", error);
+        return NextResponse.json({ error: "Failed to register user." }, { status: 500 });
     }
-    return NextResponse.json({ success: true });
 }

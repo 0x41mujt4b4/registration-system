@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
-  const isAdmin = status === "authenticated" && (session?.user as any)?.username === "admin";
+  const isAdmin = status === "authenticated" && session?.user?.username === "admin";
 
   const navigation = [
     { title: "Registration".toUpperCase(), path: "/registration" },

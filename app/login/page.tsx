@@ -29,6 +29,13 @@ export default function Login() {
         password: formData.get("password"),
         redirect: false,
       });
+
+      if (response?.error) {
+        setLoginError("Wrong username or password. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
       if (response?.ok) {
         router.push("/dashboard");
         router.refresh();

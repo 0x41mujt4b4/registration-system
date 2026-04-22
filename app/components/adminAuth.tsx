@@ -1,9 +1,15 @@
 import { getSession } from 'next-auth/react';
 
-export default function withAdminAuth(Component: React.ComponentType<any>) {
-  return async function AdminAuthComponent(context: any) {
+type AdminSessionUser = {
+  username?: string;
+};
+
+type AdminContext = Record<string, unknown>;
+
+export default function withAdminAuth(Component: React.ComponentType<AdminContext>) {
+  return async function AdminAuthComponent(context: AdminContext) {
     const session = await getSession(context);
-    const user = session?.user as any;
+    const user = session?.user as AdminSessionUser | undefined;
     console.log("with admin auth session: ", user?.username);
     if (!session || user?.username !== 'admin') {
       return {
