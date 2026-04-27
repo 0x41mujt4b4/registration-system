@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
 import { createYoga } from "graphql-yoga";
 import { schema } from "@/server/graphql";
+import type { GraphQLContext } from "@/server/graphql/resolvers";
 import { auth } from "@/auth";
 
-const { handleRequest } = createYoga({
+const { handleRequest } = createYoga<GraphQLContext>({
   schema,
   graphqlEndpoint: "/api/graphql",
   fetchAPI: { Response },

@@ -59,7 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (!session.user) {
-        session.user = {};
+        session.user = {} as unknown as NonNullable<typeof session.user>;
       }
       if (token.sub) {
         session.user.id = token.sub;

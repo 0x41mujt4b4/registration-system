@@ -22,7 +22,7 @@ const addUserArgsSchema = z.object({
   password: z.string().min(6),
 });
 
-type GraphQLContext = {
+export type GraphQLContext = {
   session?: {
     user?: {
       gatewayToken?: string;
