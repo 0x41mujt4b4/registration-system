@@ -1,5 +1,36 @@
-const VISION_GATEWAY_BASE_URL = process.env.VISION_GATEWAY_BASE_URL ?? "http://localhost:3000";
+import { VISION_GATEWAY_PROXY_SECRET_HEADER } from "@/server/visionGatewayProxyHeader";
+
 const VISION_GATEWAY_TENANT_DOMAIN = process.env.VISION_GATEWAY_TENANT_DOMAIN ?? "vision.local";
+
+const VISION_GATEWAY_DIRECT_BASE = process.env.VISION_GATEWAY_BASE_URL ?? "http://localhost:3000";
+
+function visionGatewayRequestBase(): string {
+  if (process.env.VISION_GATEWAY_USE_APP_PROXY === "true") {
+    const vercel = process.env.VERCEL_URL;
+    if (vercel) {
+      return `https://${vercel}/api/vision-gateway`;
+    }
+    const nextAuth = process.env.NEXTAUTH_URL;
+    if (nextAuth) {
+      return `${nextAuth.replace(/\/$/, "")}/api/vision-gateway`;
+    }
+    throw new Error(
+      "VISION_GATEWAY_USE_APP_PROXY is true but set VERCEL_URL (Vercel) or NEXTAUTH_URL (e.g. https://your-app.vercel.app) so the app can call its own HTTPS proxy.",
+    );
+  }
+  return VISION_GATEWAY_DIRECT_BASE.replace(/\/$/, "");
+}
+
+function gatewayFetch(pathWithLeadingSlash: string, init?: RequestInit): Promise<Response> {
+  const base = visionGatewayRequestBase();
+  const url = `${base}${pathWithLeadingSlash}`;
+  const headers = new Headers(init?.headers);
+  const secret = process.env.VISION_GATEWAY_PROXY_SECRET;
+  if (secret) {
+    headers.set(VISION_GATEWAY_PROXY_SECRET_HEADER, secret);
+  }
+  return fetch(url, { ...init, headers });
+}
 
 type GatewayStudent = {
   id?: string;
@@ -61,7 +92,7 @@ function toGatewayEmail(username: string): string {
 }
 
 export async function ensureTenantExists(): Promise<void> {
-  const response = await fetch(`${VISION_GATEWAY_BASE_URL}/tenants`, {
+  const response = await gatewayFetch("/tenants", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ domain: VISION_GATEWAY_TENANT_DOMAIN }),
@@ -76,7 +107,7 @@ export async function ensureTenantExists(): Promise<void> {
 
 export async function createGatewayUser(username: string, password: string): Promise<string> {
   await ensureTenantExists();
-  const response = await fetch(`${VISION_GATEWAY_BASE_URL}/users`, {
+  const response = await gatewayFetch("/users", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -96,7 +127,7 @@ export async function loginToGateway(username: string, password: string): Promis
     await ensureTenantExists();
   }
 
-  const response = await fetch(`${VISION_GATEWAY_BASE_URL}/auth/login`, {
+  const response = await gatewayFetch("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -115,7 +146,7 @@ function decodeJwtPayload(token: string): DecodedGatewayToken | null {
     return null;
   }
   try {
-    const decoded = Buffer.from(parts[1], "base64url").toString("utf8");
+    const decoded = Buffer.from(parts[1] ?? "", "base64url").toString("utf8");
     return JSON.parse(decoded) as DecodedGatewayToken;
   } catch {
     return null;
@@ -137,13 +168,10 @@ export async function loginToGatewayWithProfile(username: string, password: stri
 }
 
 export async function getGatewayUser(username: string): Promise<{ id: string; username: string } | null> {
-  const response = await fetch(
-    `${VISION_GATEWAY_BASE_URL}/users?email=${encodeURIComponent(toGatewayEmail(username))}`,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    },
-  );
+  const response = await gatewayFetch(`/users?email=${encodeURIComponent(toGatewayEmail(username))}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
 
   if (response.status === 404) {
     return null;
@@ -157,7 +185,7 @@ export async function getGatewayUser(username: string): Promise<{ id: string; us
 }
 
 export async function getGatewayStudents(accessToken: string): Promise<GatewayStudent[]> {
-  const response = await fetch(`${VISION_GATEWAY_BASE_URL}/students`, {
+  const response = await gatewayFetch("/students", {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -181,7 +209,7 @@ export async function createGatewayStudent(
   },
   accessToken: string,
 ): Promise<GatewayStudent> {
-  const response = await fetch(`${VISION_GATEWAY_BASE_URL}/students`, {
+  const response = await gatewayFetch("/students", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
