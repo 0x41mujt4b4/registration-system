@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchGraphQL } from "@/lib/graphql-client";
+import { fetchGraphQL, toUserFriendlyErrorMessage } from "@/lib/graphql-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -18,13 +18,20 @@ export default function Register() {
         const password = formData.get('password') as string;
 
         try {
-            await fetchGraphQL<{ addUser: string }>(`
+            const result = await fetchGraphQL<{ addUser: string }>(`
                 mutation AddUser($username: String!, $password: String!) {
                     addUser(username: $username, password: $password)
                 }
             `, { username, password });
+            if (!result.success) {
+                setError(toUserFriendlyErrorMessage(new Error(result.error)));
+                return;
+            }
             router.push('/login');
-        } catch {
+        } catch (error) {
+            console.warn("[Register] unexpected error", {
+                error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : error,
+            });
             setError('Registration failed. Please try again.');
         } finally {
             setIsLoading(false);

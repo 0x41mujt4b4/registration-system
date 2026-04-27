@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Columns from "@/app/dashboard/columns";
 import DataTable from "@/app/dashboard/data-table";
-import { fetchGraphQL } from "@/lib/graphql-client";
+import { fetchGraphQL, toUserFriendlyErrorMessage } from "@/lib/graphql-client";
 import { IStudent } from "@/types";
 
 export default function DashboardPageClient() {
@@ -33,11 +33,13 @@ export default function DashboardPageClient() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [loadError, setLoadError] = useState<string | null>(null);
   const columns = Columns({ isLoading });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoadError(null);
         const result = await fetchGraphQL<{ getStudents: IStudent[] }>(`
           query {
             getStudents {
@@ -54,9 +56,16 @@ export default function DashboardPageClient() {
             }
           }
         `);
-        setData(result.getStudents);
+        if (!result.success) {
+          setLoadError(toUserFriendlyErrorMessage(new Error(result.error)));
+          return;
+        }
+        setData(result.data.getStudents);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.warn("[Dashboard] load students failed (unexpected)", {
+          error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : error,
+        });
+        setLoadError(toUserFriendlyErrorMessage(error));
       } finally {
         setIsLoading(false);
       }
@@ -90,6 +99,11 @@ export default function DashboardPageClient() {
 
   return (
     <div className="flex h-full w-full flex-col border-t border-slate-300 bg-slate-200 px-4">
+      {loadError ? (
+        <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {loadError}
+        </div>
+      ) : null}
       <div className="flex items-center py-2">
         <Input
           placeholder="Search..."

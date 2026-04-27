@@ -180,7 +180,7 @@ export default function Columns({ isLoading }: { isLoading: boolean }) {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Payment-Date
+          Payment date
           <CaretSortIcon className="ml-2 h-4 w-4" />
         </Button>
       );},

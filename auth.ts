@@ -1,12 +1,13 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcrypt";
-import getUser from "@/server/getUser";
+import { loginToGatewayWithProfile } from "@/server/visionGatewayClient";
 
 type AuthUser = {
   id?: string;
   username?: string;
   role?: string;
+  gatewayToken?: string;
+  permissions?: string[];
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -22,25 +23,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = typeof credentials?.password === "string" ? credentials.password : "";
         if (!username || !password) return null;
 
-        const user = await getUser(username);
-        if (!user) return null;
-        if (!user.password) return null;
-
-        let isValid = false;
         try {
-          // Preferred path for hashed passwords.
-          isValid = await compare(password, user.password);
-        } catch {
-          // Backward compatibility for legacy plaintext records.
-          isValid = password === user.password;
-        }
-        if (!isValid) return null;
+          const gatewayAuth = await loginToGatewayWithProfile(username, password);
 
-        return {
-          id: user.id ?? user.username,
-          username: user.username,
-          role: user.role ?? "user",
-        };
+          return {
+            id: username,
+            username,
+            role: gatewayAuth.role,
+            permissions: gatewayAuth.permissions,
+            gatewayToken: gatewayAuth.accessToken,
+          };
+        } catch {
+          return null;
+        }
       },
     }),
   ],
@@ -57,15 +52,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const authUser = user as AuthUser;
         token.username = authUser.username;
         token.role = authUser.role;
+        token.gatewayToken = authUser.gatewayToken;
+        token.permissions = authUser.permissions;
       }
       return token;
     },
     async session({ session, token }) {
+      if (!session.user) {
+        session.user = {};
+      }
       if (token.sub) {
         session.user.id = token.sub;
       }
       session.user.username = typeof token.username === "string" ? token.username : "";
       session.user.role = typeof token.role === "string" ? token.role : "user";
+      session.user.gatewayToken = typeof token.gatewayToken === "string" ? token.gatewayToken : "";
+      session.user.permissions = Array.isArray(token.permissions) ? token.permissions : [];
       return session;
     },
   },

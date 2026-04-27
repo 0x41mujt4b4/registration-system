@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { getPostLoginPath } from "@/lib/permissions";
 
 export default async function Page() {
   const session = await auth();
-  redirect(session ? "/dashboard" : "/login");
+  if (!session) {
+    redirect("/login");
+  }
+  redirect(getPostLoginPath(session.user.permissions ?? []));
 }

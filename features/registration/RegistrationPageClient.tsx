@@ -7,7 +7,7 @@ import InputField from "@/app/components/InputField";
 import ModalError from "@/app/components/ModalError";
 import Receipt from "@/app/components/Receipt";
 import SelectField from "@/app/components/SelectField";
-import { fetchGraphQL } from "@/lib/graphql-client";
+import { fetchGraphQL, toUserFriendlyErrorMessage } from "@/lib/graphql-client";
 
 let html2pdf: ((...args: unknown[]) => { set: (options: unknown) => { from: (node: HTMLElement) => { save: () => Promise<void> } } }) | undefined;
 if (typeof window !== "undefined") {
@@ -15,37 +15,38 @@ if (typeof window !== "undefined") {
   html2pdf = require("html2pdf.js");
 }
 
+const SESSION_OPTIONS = ["Regular", "Mid-month"] as const;
+const COURSE_OPTIONS = ["Communication", "Ilets", "English club", "Esp"] as const;
+const LEVEL_OPTIONS = [
+  "Pre1",
+  "Pre2",
+  "Level-1",
+  "Level-2",
+  "Level-3",
+  "Level-4",
+  "Level-5",
+  "Level-6",
+  "Level-7",
+  "Level-8",
+] as const;
+const TIME_OPTIONS = ["11:00 - 01:00", "01:00 - 03:00", "03:00 - 05:00", "05:00 - 07:00"] as const;
+const FEES_TYPE_OPTIONS = ["Register-fees", "Course-fees", "Repeat-fees"] as const;
+
 export default function RegistrationPageClient() {
   const [name, setName] = useState("");
-  const [session, setSession] = useState("");
-  const [course, setCourse] = useState("");
-  const [level, setLevel] = useState("");
-  const [time, setTime] = useState("");
-  const [feesType, setFeesType] = useState("");
+  const [session, setSession] = useState<string>(SESSION_OPTIONS[0]);
+  const [course, setCourse] = useState<string>(COURSE_OPTIONS[0]);
+  const [level, setLevel] = useState<string>(LEVEL_OPTIONS[0]);
+  const [time, setTime] = useState<string>(TIME_OPTIONS[0]);
+  const [feesType, setFeesType] = useState<string>(FEES_TYPE_OPTIONS[0]);
   const [feesAmount, setFeesAmount] = useState<number | string>(1600);
   const [date] = useState(new Date().toLocaleDateString());
   const [studentId, setStudentId] = useState<string | null>(null);
   const [receiptNumber, setReceiptNumber] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const receiptRef = useRef<HTMLDivElement>(null);
-
-  const sessionOptions = ["Regular", "Mid-month"];
-  const courseOptions = ["Communication", "Ilets", "English club", "Esp"];
-  const levelOptions = [
-    "Pre1",
-    "Pre2",
-    "Level-1",
-    "Level-2",
-    "Level-3",
-    "Level-4",
-    "Level-5",
-    "Level-6",
-    "Level-7",
-    "Level-8",
-  ];
-  const timeOptions = ["11:00 - 01:00", "01:00 - 03:00", "03:00 - 05:00", "05:00 - 07:00"];
-  const feesTypeOptions = ["Register-fees", "Course-fees", "Repeat-fees"];
 
   const formData = {
     name,
@@ -118,19 +119,21 @@ export default function RegistrationPageClient() {
 
   const clearForm = () => {
     setName("");
-    setSession("");
-    setCourse("");
-    setLevel("");
-    setTime("");
-    setFeesType("");
+    setSession(SESSION_OPTIONS[0]);
+    setCourse(COURSE_OPTIONS[0]);
+    setLevel(LEVEL_OPTIONS[0]);
+    setTime(TIME_OPTIONS[0]);
+    setFeesType(FEES_TYPE_OPTIONS[0]);
     setFeesAmount(1600);
+    setErrorMessage("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
-    if (!name || !time || !level || !feesAmount || !course || !session || !feesType) {
-      alert("Please fill in all fields before saving.");
+    const feesNum = parseFloat(String(feesAmount));
+    if (!name.trim() || Number.isNaN(feesNum) || feesNum <= 0) {
+      alert("Please enter a valid name and fees amount.");
       return;
     }
 
@@ -138,60 +141,63 @@ export default function RegistrationPageClient() {
     try {
       const addStudentResult = await fetchGraphQL<{ addStudent: { id: string; receiptNumber: number } }>(
         `
-        mutation AddStudent($name: String!, $date: String!) {
-          addStudent(name: $name, date: $date) {
+        mutation AddStudent(
+          $name: String!
+          $time: String!
+          $feesAmount: Float!
+          $feesType: String!
+          $course: String!
+          $level: String!
+          $session: String!
+          $paymentDate: String
+        ) {
+          addStudent(
+            name: $name
+            time: $time
+            feesAmount: $feesAmount
+            feesType: $feesType
+            course: $course
+            level: $level
+            session: $session
+            paymentDate: $paymentDate
+          ) {
             id
             receiptNumber
           }
         }
       `,
-        { name, date: new Date().toISOString() },
+        {
+          name,
+          time,
+          feesAmount: feesNum,
+          feesType,
+          course,
+          level,
+          session,
+          paymentDate: new Date().toISOString(),
+        },
       );
 
-      const student_id = addStudentResult.addStudent.id;
-      const receipt_number = addStudentResult.addStudent.receiptNumber;
+      if (!addStudentResult.success) {
+        setErrorMessage(toUserFriendlyErrorMessage(new Error(addStudentResult.error)));
+        setOpen(true);
+        return;
+      }
+
+      const student_id = addStudentResult.data.addStudent.id;
+      const receipt_number = addStudentResult.data.addStudent.receiptNumber;
       setStudentId(student_id);
       setReceiptNumber(receipt_number);
-
-      await fetchGraphQL(
-        `
-        mutation AddCourse($student_id: ID!, $course_name: String, $course_level: String, $session_type: String, $session_time: String) {
-          addCourse(student_id: $student_id, course_name: $course_name, course_level: $course_level, session_type: $session_type, session_time: $session_time) {
-            id
-          }
-        }
-      `,
-        {
-          student_id,
-          course_name: course,
-          course_level: level,
-          session_type: session,
-          session_time: time,
-        },
-      );
-
-      await fetchGraphQL(
-        `
-        mutation AddFees($student_id: ID!, $fees_type: String, $amount: Float, $date: String!) {
-          addFees(student_id: $student_id, fees_type: $fees_type, amount: $amount, date: $date) {
-            id
-          }
-        }
-      `,
-        {
-          student_id,
-          fees_type: feesType,
-          amount: parseFloat(String(feesAmount)),
-          date: new Date().toISOString(),
-        },
-      );
 
       handlePrint();
       await handleSave();
       clearForm();
     } catch (error) {
+      console.warn("[Registration] save failed (unexpected)", {
+        error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : error,
+      });
+      setErrorMessage(toUserFriendlyErrorMessage(error));
       setOpen(true);
-      console.error("Error adding student:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -199,7 +205,12 @@ export default function RegistrationPageClient() {
 
   return (
     <div className="container mx-auto">
-      <ModalError open={open} setOpen={setOpen} />
+      <ModalError
+        open={open}
+        setOpen={setOpen}
+        title="Could not save student"
+        message={errorMessage || "Please try again."}
+      />
       <div className="bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-[7%]">
         <Image
           src="/vision_logo.png"
@@ -210,33 +221,33 @@ export default function RegistrationPageClient() {
         />
         <form onSubmit={handleSubmit} className="grid grid-cols-3 place-items-center gap-4">
           <InputField id="name" label="Name" value={name} onChange={setName} required />
-          <SelectField id="time" label="Time" options={timeOptions} value={time} onChange={setTime} />
-          <SelectField id="level" label="Level" options={levelOptions} value={level} onChange={setLevel} />
+          <SelectField id="time" label="Time" options={[...TIME_OPTIONS]} value={time} onChange={setTime} />
+          <SelectField id="level" label="Level" options={[...LEVEL_OPTIONS]} value={level} onChange={setLevel} />
           <InputField
             id="fees-amount"
             label="Fees Amount"
             type="number"
-            defaultValue="1600"
+            value={feesAmount}
             onChange={(value) => setFeesAmount(value)}
           />
           <SelectField
             id="course"
             label="Course"
-            options={courseOptions}
+            options={[...COURSE_OPTIONS]}
             value={course}
             onChange={setCourse}
           />
           <SelectField
             id="session"
             label="Session"
-            options={sessionOptions}
+            options={[...SESSION_OPTIONS]}
             value={session}
             onChange={setSession}
           />
           <SelectField
             id="fees-type"
             label="Fees Type"
-            options={feesTypeOptions}
+            options={[...FEES_TYPE_OPTIONS]}
             value={feesType}
             onChange={setFeesType}
             className=""

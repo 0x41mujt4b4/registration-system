@@ -47,7 +47,16 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Mutation {
-    addStudent(name: String!, date: String!): AddStudentPayload
+    addStudent(
+      name: String!
+      time: String!
+      feesAmount: Float!
+      feesType: String!
+      course: String!
+      level: String!
+      session: String!
+      paymentDate: String
+    ): AddStudentPayload
     addCourse(
       student_id: ID!
       course_name: String

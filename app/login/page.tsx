@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { toUserFriendlyErrorMessage } from "@/lib/graphql-client";
+import { getPostLoginPath } from "@/lib/permissions";
 
 export default function Login() {
   const { status } = useSession();
@@ -12,9 +14,10 @@ export default function Login() {
   const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    }
+    if (status !== "authenticated") return;
+    void getSession().then((s) => {
+      router.push(getPostLoginPath(s?.user?.permissions ?? []));
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
@@ -31,13 +34,18 @@ export default function Login() {
       });
 
       if (response?.error) {
-        setLoginError("Wrong username or password. Please try again.");
+        if (response.error === "CredentialsSignin") {
+          setLoginError("Invalid username/email or password.");
+        } else {
+          setLoginError(toUserFriendlyErrorMessage(new Error(response.error)));
+        }
         setIsLoading(false);
         return;
       }
 
       if (response?.ok) {
-        router.push("/dashboard");
+        const s = await getSession();
+        router.push(getPostLoginPath(s?.user?.permissions ?? []));
         router.refresh();
       } else {
         setIsLoading(false);
@@ -45,7 +53,7 @@ export default function Login() {
       }
     } catch {
       setIsLoading(false);
-      setLoginError("An error occurred. Please try again.");
+      setLoginError("Unable to sign in right now. Please try again.");
     }
   };
 

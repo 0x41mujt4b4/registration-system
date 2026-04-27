@@ -4,6 +4,8 @@ type AppUser = {
   id?: string;
   username?: string;
   role?: string;
+  gatewayToken?: string;
+  permissions?: string[];
 };
 
 declare module "next-auth" {
@@ -15,6 +17,8 @@ declare module "next-auth" {
     id?: string;
     username?: string;
     role?: string;
+    gatewayToken?: string;
+    permissions?: string[];
   }
 }
 
@@ -22,5 +26,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     username?: string;
     role?: string;
+    gatewayToken?: string;
+    permissions?: string[];
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createYoga } from "graphql-yoga";
 import { schema } from "@/server/graphql";
+import { auth } from "@/auth";
 
 const { handleRequest } = createYoga({
   schema,
@@ -9,13 +10,16 @@ const { handleRequest } = createYoga({
 });
 
 export async function GET(request: NextRequest): Promise<Response> {
-  return handleRequest(request, {});
+  const session = await auth();
+  return handleRequest(request, { session });
 }
 
 export async function POST(request: NextRequest): Promise<Response> {
-  return handleRequest(request, {});
+  const session = await auth();
+  return handleRequest(request, { session });
 }
 
 export async function OPTIONS(request: NextRequest): Promise<Response> {
-  return handleRequest(request, {});
+  const session = await auth();
+  return handleRequest(request, { session });
 }
