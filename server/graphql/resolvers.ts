@@ -1,5 +1,16 @@
 import { z } from "zod";
-import { createGatewayStudent, createGatewayUser, getGatewayStudents, getGatewayUser } from "@/server/visionGatewayClient";
+import {
+  createGatewayStudent,
+  createGatewayTenant,
+  createGatewayUser,
+  deleteGatewayUser,
+  getGatewayStudents,
+  getGatewayTenants,
+  getGatewayUser,
+  getGatewayUsers,
+  updateGatewayTenant,
+  updateGatewayUser,
+} from "@/server/visionGatewayClient";
 import { IStudent } from "@/types";
 
 const getUserArgsSchema = z.object({
@@ -18,14 +29,42 @@ const addStudentArgsSchema = z.object({
 });
 
 const addUserArgsSchema = z.object({
-  username: z.string().min(3),
+  name: z.string().min(2),
+  username: z.string().min(1).regex(/^\S+$/, "Username must not contain spaces"),
+  tenantDomain: z.string().min(3).regex(/^\S+$/, "Tenant domain must not contain spaces"),
   password: z.string().min(6),
+  role: z.string().optional(),
+  permissions: z.array(z.string()).optional(),
+});
+
+const addTenantArgsSchema = z.object({
+  domain: z.string().min(3).regex(/^\S+$/, "Tenant domain must not contain spaces"),
+  name: z.string().optional(),
+  status: z.string().optional(),
+});
+
+const updateUserArgsSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(2).optional(),
+  role: z.string().optional(),
+  password: z.string().min(6).optional(),
+  permissions: z.array(z.string()).optional(),
+});
+
+const updateTenantArgsSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().optional(),
+  status: z.string().optional(),
 });
 
 export type GraphQLContext = {
   session?: {
     user?: {
       gatewayToken?: string;
+      role?: string;
+      permissions?: string[];
+      tenantDomain?: string;
+      isMasterTenant?: boolean;
     };
   } | null;
 };
@@ -42,6 +81,24 @@ function toIsoTimestamp(value: string | undefined): string | undefined {
   if (value == null || value === "") return undefined;
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+}
+
+function requireAdmin(context: GraphQLContext): void {
+  const role = context.session?.user?.role;
+  if (role !== "admin") {
+    throw new Error("Insufficient role");
+  }
+}
+
+function requireTenantAdmin(context: GraphQLContext): void {
+  requireAdmin(context);
+}
+
+function requireMasterTenantAdmin(context: GraphQLContext): void {
+  requireAdmin(context);
+  if (context.session?.user?.isMasterTenant !== true) {
+    throw new Error("Tenant management is allowed only for master tenant users");
+  }
 }
 
 function mapGatewayStudentToGraphQL(student: {
@@ -82,6 +139,31 @@ export const resolvers = {
       const { username } = getUserArgsSchema.parse(rawArgs);
       return getGatewayUser(username);
     },
+    getUsers: async (_: unknown, __: unknown, context: GraphQLContext) => {
+      requireTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const users = await getGatewayUsers(accessToken);
+      return users.map((user) => ({
+        id: user.id ?? user._id ?? user.email,
+        name: user.name ?? "",
+        username: user.email,
+        role: user.role ?? "user",
+        permissions: Array.isArray(user.permissions) ? user.permissions : [],
+        tenantId: user.tenantId ?? "",
+      }));
+    },
+    getTenants: async (_: unknown, __: unknown, context: GraphQLContext) => {
+      requireMasterTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const tenants = await getGatewayTenants(accessToken);
+      return tenants.map((tenant) => ({
+        id: tenant.id ?? tenant._id ?? tenant.domain,
+        domain: tenant.domain,
+        name: tenant.name,
+        dbName: tenant.dbName,
+        status: tenant.status,
+      }));
+    },
   },
   Mutation: {
     addStudent: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
@@ -100,9 +182,60 @@ export const resolvers = {
     addFees: async () => {
       return { id: "0" };
     },
-    addUser: async (_: unknown, rawArgs: unknown) => {
-      const { username, password } = addUserArgsSchema.parse(rawArgs);
-      return createGatewayUser(username, password);
+    addUser: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
+      requireTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const { name, username, tenantDomain, password, role, permissions } = addUserArgsSchema.parse(rawArgs);
+      const effectiveTenantDomain = context.session?.user?.isMasterTenant === true
+        ? tenantDomain
+        : (context.session?.user?.tenantDomain ?? tenantDomain);
+      return createGatewayUser({ name, username, tenantDomain: effectiveTenantDomain, password, role, permissions }, accessToken);
+    },
+    updateUser: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
+      requireTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const { id, name, role, password, permissions } = updateUserArgsSchema.parse(rawArgs);
+      const user = await updateGatewayUser(id, { name, role, password, permissions }, accessToken);
+      return {
+        id: user.id ?? user._id ?? user.email,
+        name: user.name ?? "",
+        username: user.email,
+        role: user.role ?? "user",
+        permissions: Array.isArray(user.permissions) ? user.permissions : [],
+        tenantId: user.tenantId ?? "",
+      };
+    },
+    deleteUser: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
+      requireTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const { id } = z.object({ id: z.string().min(1) }).parse(rawArgs);
+      return deleteGatewayUser(id, accessToken);
+    },
+    addTenant: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
+      requireMasterTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const { domain, name, status } = addTenantArgsSchema.parse(rawArgs);
+      const tenant = await createGatewayTenant({ domain, name, status }, accessToken);
+      return {
+        id: tenant.id ?? tenant._id ?? tenant.domain,
+        domain: tenant.domain,
+        name: tenant.name,
+        dbName: tenant.dbName,
+        status: tenant.status,
+      };
+    },
+    updateTenant: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
+      requireMasterTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const { id, name, status } = updateTenantArgsSchema.parse(rawArgs);
+      const tenant = await updateGatewayTenant(id, { name, status }, accessToken);
+      return {
+        id: tenant.id ?? tenant._id ?? tenant.domain,
+        domain: tenant.domain,
+        name: tenant.name,
+        dbName: tenant.dbName,
+        status: tenant.status,
+      };
     },
   },
 };

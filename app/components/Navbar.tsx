@@ -4,13 +4,16 @@ import Logout from "./logout";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { canAccessDashboard, canAccessRegistration } from "@/lib/permissions";
+import { canAccessAdminPanel, canAccessDashboard, canAccessRegistration } from "@/lib/permissions";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const permissions = session?.user?.permissions ?? [];
+  const role = session?.user?.role;
+  const isMasterTenant = session?.user?.isMasterTenant;
   const showRegistration = status === "authenticated" && canAccessRegistration(permissions);
   const showDashboard = status === "authenticated" && canAccessDashboard(permissions);
+  const showAdminPanel = status === "authenticated" && canAccessAdminPanel(role, permissions, isMasterTenant);
 
   return (
     <nav className="mb-4 w-full border-b border-slate-300 bg-slate-200 md:static md:text-sm">
@@ -32,6 +35,13 @@ export default function Navbar() {
               <li className="font-bold text-sky-600 hover:text-sky-300">
                 <Link href="/registration" className="block">
                   REGISTRATION
+                </Link>
+              </li>
+            ) : null}
+            {showAdminPanel ? (
+              <li className="font-bold text-sky-600 hover:text-sky-300">
+                <Link href="/admin-panel" className="block">
+                  ADMIN PANEL
                 </Link>
               </li>
             ) : null}

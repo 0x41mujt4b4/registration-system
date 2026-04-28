@@ -51,7 +51,20 @@ type GatewayStudent = {
 type GatewayUser = {
   id?: string;
   _id?: string;
+  name?: string;
   email: string;
+  role?: string;
+  permissions?: string[];
+  tenantId?: string;
+};
+
+type GatewayTenant = {
+  id?: string;
+  _id?: string;
+  domain: string;
+  name: string;
+  dbName: string;
+  status: string;
 };
 
 type GatewayLoginPayload = {
@@ -61,6 +74,10 @@ type GatewayLoginPayload = {
 type DecodedGatewayToken = {
   role?: string;
   permissions?: string[];
+  tenantId?: string;
+  tenantDomain?: string;
+  tenantDbName?: string;
+  isMasterTenant?: boolean;
 };
 
 async function parseGatewayResponse<T>(response: Response): Promise<T> {
@@ -91,42 +108,32 @@ function toGatewayEmail(username: string): string {
   return `${normalized}@${VISION_GATEWAY_TENANT_DOMAIN}`;
 }
 
-export async function ensureTenantExists(): Promise<void> {
-  const response = await gatewayFetch("/tenants", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ domain: VISION_GATEWAY_TENANT_DOMAIN }),
-  });
-
-  if (response.ok || response.status === 409) {
-    return;
-  }
-
-  await parseGatewayResponse<unknown>(response);
-}
-
-export async function createGatewayUser(username: string, password: string): Promise<string> {
-  await ensureTenantExists();
+export async function createGatewayUser(
+  input: { name: string; username: string; tenantDomain: string; password: string; role?: string; permissions?: string[] },
+  accessToken: string,
+): Promise<string> {
+  const tenantEmail = `${input.username.trim().toLowerCase()}@${input.tenantDomain.trim().toLowerCase()}`;
   const response = await gatewayFetch("/users", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
-      name: username.trim(),
-      email: toGatewayEmail(username),
-      password,
+      name: input.name.trim(),
+      username: input.username.trim().toLowerCase(),
+      tenantDomain: input.tenantDomain.trim().toLowerCase(),
+      password: input.password,
+      role: input.role ?? "user",
+      permissions: Array.isArray(input.permissions) ? input.permissions : [],
     }),
   });
 
   const createdUser = await parseGatewayResponse<GatewayUser>(response);
-  return createdUser.id ?? createdUser._id ?? toGatewayEmail(username);
+  return createdUser.id ?? createdUser._id ?? tenantEmail;
 }
 
 export async function loginToGateway(username: string, password: string): Promise<string> {
-  // For username-based login (without @domain), make sure the fallback tenant exists.
-  if (!username.includes("@")) {
-    await ensureTenantExists();
-  }
-
   const response = await gatewayFetch("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -157,6 +164,10 @@ export async function loginToGatewayWithProfile(username: string, password: stri
   accessToken: string;
   role: string;
   permissions: string[];
+  tenantId: string;
+  tenantDomain: string;
+  tenantDbName: string;
+  isMasterTenant: boolean;
 }> {
   const accessToken = await loginToGateway(username, password);
   const decoded = decodeJwtPayload(accessToken);
@@ -164,6 +175,10 @@ export async function loginToGatewayWithProfile(username: string, password: stri
     accessToken,
     role: decoded?.role ?? "user",
     permissions: Array.isArray(decoded?.permissions) ? decoded.permissions : [],
+    tenantId: typeof decoded?.tenantId === "string" ? decoded.tenantId : "",
+    tenantDomain: typeof decoded?.tenantDomain === "string" ? decoded.tenantDomain : "",
+    tenantDbName: typeof decoded?.tenantDbName === "string" ? decoded.tenantDbName : "",
+    isMasterTenant: decoded?.isMasterTenant === true,
   };
 }
 
@@ -182,6 +197,90 @@ export async function getGatewayUser(username: string): Promise<{ id: string; us
     id: user.id ?? user._id ?? toGatewayEmail(username),
     username,
   };
+}
+
+export async function getGatewayUsers(accessToken: string): Promise<GatewayUser[]> {
+  const response = await gatewayFetch("/users/list", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return parseGatewayResponse<GatewayUser[]>(response);
+}
+
+export async function getGatewayTenants(accessToken: string): Promise<GatewayTenant[]> {
+  const response = await gatewayFetch("/tenants", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return parseGatewayResponse<GatewayTenant[]>(response);
+}
+
+export async function createGatewayTenant(
+  input: { domain: string; name?: string; status?: string },
+  accessToken: string,
+): Promise<GatewayTenant> {
+  const response = await gatewayFetch("/tenants", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+  return parseGatewayResponse<GatewayTenant>(response);
+}
+
+export async function updateGatewayUser(
+  id: string,
+  input: { name?: string; role?: string; password?: string; permissions?: string[] },
+  accessToken: string,
+): Promise<GatewayUser> {
+  const response = await gatewayFetch(`/users/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+  return parseGatewayResponse<GatewayUser>(response);
+}
+
+export async function deleteGatewayUser(id: string, accessToken: string): Promise<boolean> {
+  const response = await gatewayFetch(`/users/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (response.ok) {
+    return true;
+  }
+  await parseGatewayResponse<unknown>(response);
+  return false;
+}
+
+export async function updateGatewayTenant(
+  id: string,
+  input: { name?: string; status?: string },
+  accessToken: string,
+): Promise<GatewayTenant> {
+  const response = await gatewayFetch(`/tenants/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+  return parseGatewayResponse<GatewayTenant>(response);
 }
 
 export async function getGatewayStudents(accessToken: string): Promise<GatewayStudent[]> {

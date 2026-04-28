@@ -7,5 +7,5 @@ export default async function Page() {
   if (!session) {
     redirect("/login");
   }
-  redirect(getPostLoginPath(session.user.permissions ?? []));
+  redirect(getPostLoginPath(session.user.permissions ?? [], session.user.role, session.user.isMasterTenant));
 }

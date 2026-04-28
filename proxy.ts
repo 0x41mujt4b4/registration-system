@@ -33,5 +33,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/", "/dashboard", "/registration", "/register"],
+  matcher: ["/", "/dashboard", "/registration", "/admin-panel"],
 };

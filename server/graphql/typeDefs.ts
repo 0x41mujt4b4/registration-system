@@ -32,13 +32,26 @@ export const typeDefs = /* GraphQL */ `
 
   type User {
     id: ID!
+    name: String
     username: String!
     role: String
+    permissions: [String!]
+    tenantId: String
+  }
+
+  type Tenant {
+    id: ID!
+    domain: String!
+    name: String!
+    dbName: String!
+    status: String!
   }
 
   type Query {
     getStudents: [Student]
     getUser(username: String!): User
+    getUsers: [User!]
+    getTenants: [Tenant!]
   }
 
   type AddStudentPayload {
@@ -65,6 +78,10 @@ export const typeDefs = /* GraphQL */ `
       session_time: String
     ): Course
     addFees(student_id: ID!, fees_type: String, amount: Float, date: String!): Fees
-    addUser(username: String!, password: String!, role: String): ID
+    addUser(name: String!, username: String!, tenantDomain: String!, password: String!, role: String, permissions: [String!]): ID
+    updateUser(id: ID!, name: String, role: String, password: String, permissions: [String!]): User
+    deleteUser(id: ID!): Boolean!
+    addTenant(domain: String!, name: String, status: String): Tenant
+    updateTenant(id: ID!, name: String, status: String): Tenant
   }
 `;

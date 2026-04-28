@@ -8,6 +8,10 @@ type AuthUser = {
   role?: string;
   gatewayToken?: string;
   permissions?: string[];
+  tenantId?: string;
+  tenantDomain?: string;
+  tenantDbName?: string;
+  isMasterTenant?: boolean;
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -32,6 +36,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             role: gatewayAuth.role,
             permissions: gatewayAuth.permissions,
             gatewayToken: gatewayAuth.accessToken,
+            tenantId: gatewayAuth.tenantId,
+            tenantDomain: gatewayAuth.tenantDomain,
+            tenantDbName: gatewayAuth.tenantDbName,
+            isMasterTenant: gatewayAuth.isMasterTenant,
           };
         } catch {
           return null;
@@ -54,6 +62,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = authUser.role;
         token.gatewayToken = authUser.gatewayToken;
         token.permissions = authUser.permissions;
+        token.tenantId = authUser.tenantId;
+        token.tenantDomain = authUser.tenantDomain;
+        token.tenantDbName = authUser.tenantDbName;
+        token.isMasterTenant = authUser.isMasterTenant;
       }
       return token;
     },
@@ -68,6 +80,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.role = typeof token.role === "string" ? token.role : "user";
       session.user.gatewayToken = typeof token.gatewayToken === "string" ? token.gatewayToken : "";
       session.user.permissions = Array.isArray(token.permissions) ? token.permissions : [];
+      session.user.tenantId = typeof token.tenantId === "string" ? token.tenantId : "";
+      session.user.tenantDomain = typeof token.tenantDomain === "string" ? token.tenantDomain : "";
+      session.user.tenantDbName = typeof token.tenantDbName === "string" ? token.tenantDbName : "";
+      session.user.isMasterTenant = token.isMasterTenant === true;
       return session;
     },
   },

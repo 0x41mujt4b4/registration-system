@@ -6,6 +6,10 @@ type AppUser = {
   role?: string;
   gatewayToken?: string;
   permissions?: string[];
+  tenantId?: string;
+  tenantDomain?: string;
+  tenantDbName?: string;
+  isMasterTenant?: boolean;
 };
 
 declare module "next-auth" {
@@ -19,6 +23,10 @@ declare module "next-auth" {
     role?: string;
     gatewayToken?: string;
     permissions?: string[];
+    tenantId?: string;
+    tenantDomain?: string;
+    tenantDbName?: string;
+    isMasterTenant?: boolean;
   }
 }
 
@@ -28,5 +36,9 @@ declare module "next-auth/jwt" {
     role?: string;
     gatewayToken?: string;
     permissions?: string[];
+    tenantId?: string;
+    tenantDomain?: string;
+    tenantDbName?: string;
+    isMasterTenant?: boolean;
   }
 }

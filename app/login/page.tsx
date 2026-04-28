@@ -16,7 +16,7 @@ export default function Login() {
   useEffect(() => {
     if (status !== "authenticated") return;
     void getSession().then((s) => {
-      router.push(getPostLoginPath(s?.user?.permissions ?? []));
+      router.push(getPostLoginPath(s?.user?.permissions ?? [], s?.user?.role, s?.user?.isMasterTenant));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
@@ -45,7 +45,7 @@ export default function Login() {
 
       if (response?.ok) {
         const s = await getSession();
-        router.push(getPostLoginPath(s?.user?.permissions ?? []));
+        router.push(getPostLoginPath(s?.user?.permissions ?? [], s?.user?.role, s?.user?.isMasterTenant));
         router.refresh();
       } else {
         setIsLoading(false);
