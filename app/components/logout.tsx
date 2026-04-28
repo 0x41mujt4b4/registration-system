@@ -3,14 +3,18 @@ import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { Spinner } from "@radix-ui/themes";
 import { PowerIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 
 export default function Logout() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await signOut({ callbackUrl: `${window.location.origin}/login` });
+      await signOut({ redirect: false });
+      router.push("/login");
+      router.refresh();
     } finally {
       setIsLoading(false);
     }
