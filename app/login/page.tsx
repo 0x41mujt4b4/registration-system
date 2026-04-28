@@ -58,8 +58,8 @@ export default function Login() {
   };
 
   return (
-    <main className="w-full flex flex-col items-center justify-center px-4">
-      <div className="max-w-xl w-full bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-2xl py-11 px-16">
+    <main className="flex min-h-[calc(100vh-5rem)] w-full items-center justify-center px-4 py-8">
+      <div className="surface-elevated w-full max-w-xl rounded-2xl px-6 py-10 sm:px-10">
         <div className="flex flex-col items-center">
           <Image
             src="/vision_logo.png"
@@ -68,30 +68,34 @@ export default function Login() {
             height={112}
             className="mx-auto h-28 w-auto"
           />
+          <h1 className="mt-4 text-xl font-semibold text-slate-900">Welcome back</h1>
+          <p className="mt-1 text-sm text-slate-700">Sign in to continue to the registration system.</p>
         </div>
         <form onSubmit={handleLogin} className="mt-8 space-y-5">
           <div>
-            <label className="font-medium text-black">Username</label>
+            <label htmlFor="username" className="font-medium text-black">Username</label>
             <input
               name="username"
               type="text"
               id="username"
               required
               className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-sky-600 shadow-sm rounded-lg"
+              autoComplete="username"
             />
           </div>
           <div>
-            <label className="font-medium text-black">Password</label>
+            <label htmlFor="password" className="font-medium text-black">Password</label>
             <input
               name="password"
               type="password"
               id="password"
               required
               className="w-full mt-2 px-3 py-2 text-black bg-white outline-none border focus:border-sky-600 shadow-sm rounded-lg"
+              autoComplete="current-password"
             />
           </div>
           {loginError && (
-            <p className="text-red-600 text-sm">{loginError}</p>
+            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{loginError}</p>
           )}
           <button
             disabled={isLoading}

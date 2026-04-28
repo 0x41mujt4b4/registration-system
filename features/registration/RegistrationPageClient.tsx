@@ -236,14 +236,14 @@ export default function RegistrationPageClient() {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto px-4 pb-6">
       <ModalError
         open={open}
         setOpen={setOpen}
         title="Could not save student"
         message={errorMessage || "Please try again."}
       />
-      <div className="bg bg-slate-300 bg-opacity-75 backdrop-filter backdrop-blur-lg shadow-lg rounded-lg p-[7%]">
+      <div className="surface-elevated rounded-lg p-6 md:p-10">
         <Image
           src="/vision_logo.png"
           alt="vision logo"
@@ -254,7 +254,7 @@ export default function RegistrationPageClient() {
         {loadingOptions || !registrationOptions ? (
           <div className="py-8 text-center text-sm text-slate-600">Loading registration options...</div>
         ) : (
-          <form onSubmit={handleSubmit} className="grid grid-cols-3 place-items-center gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <InputField id="name" label="Name" value={name} onChange={setName} required />
           <SelectField id="time" label="Time" options={registrationOptions.timeOptions} value={time} onChange={setTime} />
           <SelectField id="level" label="Level" options={registrationOptions.levelOptions} value={level} onChange={setLevel} />
@@ -287,7 +287,7 @@ export default function RegistrationPageClient() {
             onChange={setFeesType}
             className=""
           />
-          <div className="col-start-3 justify-self-end space-x-4 self-end lg:px-10">
+          <div className="flex flex-wrap justify-end gap-3 md:col-span-2 xl:col-span-3">
             <Button
               className="rounded-lg bg-red-600 text-md text-white duration-150 hover:bg-white hover:text-red-600 active:bg-red-600 active:text-white"
               type="button"

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnFiltersState,
+  FilterFn,
   SortingState,
   VisibilityState,
   getCoreRowModel,
@@ -31,6 +32,7 @@ export default function DashboardPageClient() {
   const [data, setData] = useState<IStudent[]>(Array(10).fill({ name: "" }));
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -79,6 +81,26 @@ export default function DashboardPageClient() {
     XLSX.writeFile(workbook, "students_report.xlsx");
   };
 
+  const globalSearchFilter: FilterFn<IStudent> = (row, _columnId, filterValue) => {
+    const query = String(filterValue ?? "").trim().toLowerCase();
+    if (!query) return true;
+
+    const student = row.original;
+    const searchableValues = [
+      student.student_number,
+      student.name,
+      student.session,
+      student.course,
+      student.level,
+      student.time,
+      student.fees_type,
+      student.amount,
+      student.payment_date,
+    ];
+
+    return searchableValues.some((value) => String(value ?? "").toLowerCase().includes(query));
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -87,11 +109,14 @@ export default function DashboardPageClient() {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: globalSearchFilter,
+    onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
+      globalFilter,
       columnVisibility,
       rowSelection,
     },
@@ -106,9 +131,9 @@ export default function DashboardPageClient() {
       ) : null}
       <div className="flex items-center py-2">
         <Input
-          placeholder="Search..."
-          value={(table.getColumn("level")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("level")?.setFilterValue(event.target.value)}
+          placeholder="Search ID, name, session, course, level..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm bg-white"
         />
         <DropdownMenu>

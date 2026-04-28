@@ -4,20 +4,26 @@ import Logout from "./logout";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { canAccessAdminPanel, canAccessDashboard, canAccessRegistration } from "@/lib/permissions";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
   const permissions = session?.user?.permissions ?? [];
   const role = session?.user?.role;
   const isMasterTenant = session?.user?.isMasterTenant;
   const showRegistration = status === "authenticated" && canAccessRegistration(permissions);
   const showDashboard = status === "authenticated" && canAccessDashboard(permissions);
   const showAdminPanel = status === "authenticated" && canAccessAdminPanel(role, permissions, isMasterTenant);
+  const navLinkClass = (href: string) =>
+    `block rounded-md px-2 py-1 font-bold transition-colors ${
+      pathname === href ? "bg-sky-600 text-white" : "text-sky-700 hover:text-sky-500"
+    }`;
 
   return (
-    <nav className="mb-4 w-full border-b border-slate-300 bg-slate-200 md:static md:text-sm">
-      <div className="mx-auto flex justify-between px-4">
+    <nav className="mb-4 w-full border-b border-slate-300 bg-slate-200/95 backdrop-blur md:static md:text-sm">
+      <div className="mx-auto flex max-w-7xl justify-between px-4">
         <div className="flex items-center justify-between py-3 md:block md:py-2">
           <Link href="/">
             <Image
@@ -32,23 +38,23 @@ export default function Navbar() {
         <div className="flex flex-row">
           <ul className="flex items-center space-x-6">
             {showRegistration ? (
-              <li className="font-bold text-sky-600 hover:text-sky-300">
-                <Link href="/registration" className="block">
+              <li>
+                <Link href="/registration" className={navLinkClass("/registration")}>
                   REGISTRATION
                 </Link>
               </li>
             ) : null}
             {showAdminPanel ? (
-              <li className="font-bold text-sky-600 hover:text-sky-300">
-                <Link href="/admin-panel" className="block">
+              <li>
+                <Link href="/admin-panel" className={navLinkClass("/admin-panel")}>
                   ADMIN PANEL
                 </Link>
               </li>
             ) : null}
             {showRegistration && showDashboard ? <span className="hidden h-6 w-px bg-sky-600 md:block" /> : null}
             {showDashboard ? (
-              <li className="font-bold text-sky-600 hover:text-sky-300">
-                <Link href="/dashboard" className="block">
+              <li>
+                <Link href="/dashboard" className={navLinkClass("/dashboard")}>
                   DASHBOARD
                 </Link>
               </li>

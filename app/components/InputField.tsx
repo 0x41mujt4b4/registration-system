@@ -12,7 +12,7 @@ interface InputFieldProps {
 
 export default function InputField({ id, label, type = 'text', value, defaultValue, onChange, required }: InputFieldProps) {
     return (
-        <div className="relative max-w-xs w-full">
+        <div className="relative w-full">
             <label htmlFor={id} className="block uppercase tracking-wide text-black text-sm font-bold mb-2">{label}</label>
             {id === 'fees-amount' && (
                 <span className="h-8 mb-1 text-slate-600 absolute left-3 inset-y-0 my-auto">

@@ -10,7 +10,7 @@ interface SelectFieldProps {
 
 export default function SelectField({ id, label, options, placeholder, value, onChange, className }: SelectFieldProps) {
   return (
-    <div className={`w-96 max-w-xs ${className || ""}`}>
+    <div className={`w-full ${className || ""}`}>
         <label htmlFor={id} className="block uppercase tracking-wide text-black text-sm font-bold mb-2">{label}</label>
       <select
         id={id}

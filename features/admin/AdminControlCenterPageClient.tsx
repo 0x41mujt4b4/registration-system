@@ -271,9 +271,12 @@ export default function AdminControlCenterPageClient({
   };
 
   useEffect(() => {
-    void loadUsers();
-    void loadTenants();
-    void loadRegistrationOptions();
+    const timer = window.setTimeout(() => {
+      void loadUsers();
+      void loadTenants();
+      void loadRegistrationOptions();
+    }, 0);
+    return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
