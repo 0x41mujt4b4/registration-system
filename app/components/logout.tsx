@@ -9,7 +9,11 @@ export default function Logout() {
 
   const handleLogout = async () => {
     setIsLoading(true);
-    await signOut();
+    try {
+      await signOut({ callbackUrl: `${window.location.origin}/login` });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading) {
