@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchGraphQL, toUserFriendlyErrorMessage } from "@/lib/graphql-client";
+import { IRegistrationOptions } from "@/types";
 import {
   canCreateTenants,
   canCreateUsers,
@@ -38,6 +39,17 @@ type ManagedTenant = {
   status: string;
 };
 
+type EditableRegistrationOptions = {
+  sessionOptions: string[];
+  courseOptions: string[];
+  levelOptions: string[];
+  timeOptions: string[];
+  feesTypeOptions: string[];
+  defaultFeesAmount: string;
+};
+
+type OptionGroupKey = Exclude<keyof EditableRegistrationOptions, "defaultFeesAmount">;
+
 const DEFAULT_USER_PERMISSIONS = ["students:read", "students:create"] as const;
 const ALL_MANAGEABLE_PERMISSIONS = [
   STUDENTS_READ,
@@ -47,6 +59,13 @@ const ALL_MANAGEABLE_PERMISSIONS = [
   TENANTS_READ,
   TENANTS_CREATE,
 ] as const;
+const OPTION_GROUPS: { key: OptionGroupKey; label: string }[] = [
+  { key: "sessionOptions", label: "Session options" },
+  { key: "courseOptions", label: "Course options" },
+  { key: "levelOptions", label: "Level options" },
+  { key: "timeOptions", label: "Time options" },
+  { key: "feesTypeOptions", label: "Fees type options" },
+];
 
 function splitEmail(email: string): { username: string; domain: string } {
   const [username = "", domain = ""] = email.split("@");
@@ -96,6 +115,46 @@ export default function AdminControlCenterPageClient({
   const [editingTenantName, setEditingTenantName] = useState("");
   const [editingTenantStatus, setEditingTenantStatus] = useState("active");
   const [savingTenant, setSavingTenant] = useState(false);
+  const [loadingRegistrationOptions, setLoadingRegistrationOptions] = useState(true);
+  const [savingRegistrationOptions, setSavingRegistrationOptions] = useState(false);
+  const [registrationOptionsError, setRegistrationOptionsError] = useState<string | null>(null);
+  const [registrationOptionsSuccess, setRegistrationOptionsSuccess] = useState<string | null>(null);
+  const [registrationOptions, setRegistrationOptions] = useState<EditableRegistrationOptions>({
+    sessionOptions: [],
+    courseOptions: [],
+    levelOptions: [],
+    timeOptions: [],
+    feesTypeOptions: [],
+    defaultFeesAmount: "1600",
+  });
+  const [newOptionValues, setNewOptionValues] = useState<Record<OptionGroupKey, string>>({
+    sessionOptions: "",
+    courseOptions: "",
+    levelOptions: "",
+    timeOptions: "",
+    feesTypeOptions: "",
+  });
+  const [selectedOptionIndexes, setSelectedOptionIndexes] = useState<Record<OptionGroupKey, number>>({
+    sessionOptions: -1,
+    courseOptions: -1,
+    levelOptions: -1,
+    timeOptions: -1,
+    feesTypeOptions: -1,
+  });
+  const [editingOptionIndexes, setEditingOptionIndexes] = useState<Record<OptionGroupKey, number>>({
+    sessionOptions: -1,
+    courseOptions: -1,
+    levelOptions: -1,
+    timeOptions: -1,
+    feesTypeOptions: -1,
+  });
+  const [editingOptionValues, setEditingOptionValues] = useState<Record<OptionGroupKey, string>>({
+    sessionOptions: "",
+    courseOptions: "",
+    levelOptions: "",
+    timeOptions: "",
+    feesTypeOptions: "",
+  });
 
   const canReadUsersList = canReadUsers(permissions);
   const canReadTenantsList = canReadTenants(permissions);
@@ -157,11 +216,198 @@ export default function AdminControlCenterPageClient({
     setLoadingTenants(false);
   };
 
+  const toEditableRegistrationOptions = (options: IRegistrationOptions): EditableRegistrationOptions => ({
+    sessionOptions: options.sessionOptions,
+    courseOptions: options.courseOptions,
+    levelOptions: options.levelOptions,
+    timeOptions: options.timeOptions,
+    feesTypeOptions: options.feesTypeOptions,
+    defaultFeesAmount: String(options.defaultFeesAmount ?? 0),
+  });
+
+  const loadRegistrationOptions = async () => {
+    setLoadingRegistrationOptions(true);
+    setRegistrationOptionsError(null);
+    const result = await fetchGraphQL<{ getRegistrationOptions: IRegistrationOptions }>(`
+      query GetRegistrationOptions {
+        getRegistrationOptions {
+          sessionOptions
+          courseOptions
+          levelOptions
+          timeOptions
+          feesTypeOptions
+          defaultFeesAmount
+        }
+      }
+    `);
+    if (!result.success) {
+      setRegistrationOptionsError(toUserFriendlyErrorMessage(new Error(result.error)));
+      setLoadingRegistrationOptions(false);
+      return;
+    }
+    setRegistrationOptions(toEditableRegistrationOptions(result.data.getRegistrationOptions));
+    setSelectedOptionIndexes({
+      sessionOptions: -1,
+      courseOptions: -1,
+      levelOptions: -1,
+      timeOptions: -1,
+      feesTypeOptions: -1,
+    });
+    setEditingOptionIndexes({
+      sessionOptions: -1,
+      courseOptions: -1,
+      levelOptions: -1,
+      timeOptions: -1,
+      feesTypeOptions: -1,
+    });
+    setEditingOptionValues({
+      sessionOptions: "",
+      courseOptions: "",
+      levelOptions: "",
+      timeOptions: "",
+      feesTypeOptions: "",
+    });
+    setLoadingRegistrationOptions(false);
+  };
+
   useEffect(() => {
     void loadUsers();
     void loadTenants();
+    void loadRegistrationOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const updateOptionGroup = (group: OptionGroupKey, updater: (current: string[]) => string[]) => {
+    setRegistrationOptions((prev) => ({ ...prev, [group]: updater(prev[group]) }));
+  };
+
+  const persistRegistrationOptions = async (
+    nextOptions: EditableRegistrationOptions,
+    successMessage: string,
+  ): Promise<boolean> => {
+    const defaultFeesAmount = Number.parseFloat(nextOptions.defaultFeesAmount);
+    if (Number.isNaN(defaultFeesAmount) || defaultFeesAmount < 0) {
+      setRegistrationOptionsError("Default fees amount must be a valid positive number.");
+      return false;
+    }
+    setSavingRegistrationOptions(true);
+    setRegistrationOptionsError(null);
+    setRegistrationOptionsSuccess(null);
+    const result = await fetchGraphQL<{ updateRegistrationOptions: IRegistrationOptions }>(
+      `
+      mutation UpdateRegistrationOptions(
+        $sessionOptions: [String!]
+        $courseOptions: [String!]
+        $levelOptions: [String!]
+        $timeOptions: [String!]
+        $feesTypeOptions: [String!]
+        $defaultFeesAmount: Float
+      ) {
+        updateRegistrationOptions(
+          sessionOptions: $sessionOptions
+          courseOptions: $courseOptions
+          levelOptions: $levelOptions
+          timeOptions: $timeOptions
+          feesTypeOptions: $feesTypeOptions
+          defaultFeesAmount: $defaultFeesAmount
+        ) {
+          sessionOptions
+          courseOptions
+          levelOptions
+          timeOptions
+          feesTypeOptions
+          defaultFeesAmount
+        }
+      }
+      `,
+      {
+        sessionOptions: nextOptions.sessionOptions,
+        courseOptions: nextOptions.courseOptions,
+        levelOptions: nextOptions.levelOptions,
+        timeOptions: nextOptions.timeOptions,
+        feesTypeOptions: nextOptions.feesTypeOptions,
+        defaultFeesAmount,
+      },
+    );
+    if (!result.success) {
+      setRegistrationOptionsError(toUserFriendlyErrorMessage(new Error(result.error)));
+      setSavingRegistrationOptions(false);
+      return false;
+    }
+    setRegistrationOptions(toEditableRegistrationOptions(result.data.updateRegistrationOptions));
+    setRegistrationOptionsSuccess(successMessage);
+    setSavingRegistrationOptions(false);
+    return true;
+  };
+
+  const addOptionToGroup = async (group: OptionGroupKey) => {
+    const value = newOptionValues[group].trim();
+    if (!value) {
+      setRegistrationOptionsError("Option value cannot be empty.");
+      return;
+    }
+    if (registrationOptions[group].includes(value)) {
+      setRegistrationOptionsError(`"${value}" already exists in ${group}.`);
+      return;
+    }
+    const nextOptions: EditableRegistrationOptions = {
+      ...registrationOptions,
+      [group]: [...registrationOptions[group], value],
+    };
+    const ok = await persistRegistrationOptions(nextOptions, "Option added successfully.");
+    if (!ok) return;
+    setNewOptionValues((prev) => ({ ...prev, [group]: "" }));
+  };
+
+  const deleteSelectedOption = async (group: OptionGroupKey) => {
+    const idx = selectedOptionIndexes[group];
+    if (idx < 0) return;
+    const nextOptions: EditableRegistrationOptions = {
+      ...registrationOptions,
+      [group]: registrationOptions[group].filter((_, optionIndex) => optionIndex !== idx),
+    };
+    const ok = await persistRegistrationOptions(nextOptions, "Option deleted successfully.");
+    if (!ok) return;
+    setSelectedOptionIndexes((prev) => ({ ...prev, [group]: -1 }));
+    setEditingOptionIndexes((prev) => ({ ...prev, [group]: -1 }));
+    setEditingOptionValues((prev) => ({ ...prev, [group]: "" }));
+  };
+
+  const startEditingOption = (group: OptionGroupKey) => {
+    const idx = selectedOptionIndexes[group];
+    if (idx < 0) return;
+    const selectedValue = registrationOptions[group][idx] ?? "";
+    setEditingOptionIndexes((prev) => ({ ...prev, [group]: idx }));
+    setEditingOptionValues((prev) => ({ ...prev, [group]: selectedValue }));
+  };
+
+  const saveEditedOption = async (group: OptionGroupKey) => {
+    const idx = editingOptionIndexes[group];
+    const nextValue = editingOptionValues[group].trim();
+    if (idx < 0 || !nextValue) {
+      setRegistrationOptionsError("Updated option cannot be empty.");
+      return;
+    }
+    const duplicateIndex = registrationOptions[group].findIndex((item) => item === nextValue);
+    if (duplicateIndex >= 0 && duplicateIndex !== idx) {
+      setRegistrationOptionsError(`"${nextValue}" already exists in ${group}.`);
+      return;
+    }
+    const nextOptions: EditableRegistrationOptions = {
+      ...registrationOptions,
+      [group]: registrationOptions[group].map((item, optionIndex) => (optionIndex === idx ? nextValue : item)),
+    };
+    const ok = await persistRegistrationOptions(nextOptions, "Option updated successfully.");
+    if (!ok) return;
+    setEditingOptionIndexes((prev) => ({ ...prev, [group]: -1 }));
+    setEditingOptionValues((prev) => ({ ...prev, [group]: "" }));
+  };
+
+  const saveRegistrationOptions = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (savingRegistrationOptions) return;
+    void persistRegistrationOptions(registrationOptions, "Registration options saved successfully.");
+  };
 
   const createUser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -606,6 +852,130 @@ export default function AdminControlCenterPageClient({
             </table>
           )}
         </div>
+      </section>
+
+      <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+        <h2 className="text-lg font-semibold text-slate-800">Registration Options</h2>
+        <p className="mt-1 text-xs text-slate-500">
+          These options are used by the registration page for this tenant.
+        </p>
+        {registrationOptionsError ? (
+          <p className="mt-3 rounded bg-red-100 p-2 text-sm text-red-700">{registrationOptionsError}</p>
+        ) : null}
+        {registrationOptionsSuccess ? (
+          <p className="mt-3 rounded bg-green-100 p-2 text-sm text-green-700">{registrationOptionsSuccess}</p>
+        ) : null}
+        {loadingRegistrationOptions ? (
+          <p className="mt-3 text-sm text-slate-500">Loading registration options...</p>
+        ) : (
+          <form className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2" onSubmit={saveRegistrationOptions}>
+            <div className="md:col-span-2 grid grid-cols-1 gap-4">
+              {OPTION_GROUPS.map(({ key, label }) => {
+                const selectedIndex = selectedOptionIndexes[key];
+                const editIndex = editingOptionIndexes[key];
+                return (
+                  <div key={key} className="rounded border border-slate-200 p-3">
+                    <p className="mb-2 text-xs font-medium text-slate-600">{label}</p>
+                    <select
+                      className="w-full rounded border border-slate-300 px-3 py-2"
+                      value={selectedIndex >= 0 ? String(selectedIndex) : ""}
+                      onChange={(event) => {
+                        const nextIndex = event.target.value === "" ? -1 : Number.parseInt(event.target.value, 10);
+                        setSelectedOptionIndexes((prev) => ({ ...prev, [key]: Number.isNaN(nextIndex) ? -1 : nextIndex }));
+                      }}
+                    >
+                      <option value="">Select option...</option>
+                      {registrationOptions[key].map((option, optionIndex) => (
+                        <option key={`${key}-${option}-${optionIndex}`} value={optionIndex}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="rounded bg-slate-200 px-3 py-1 text-slate-700 disabled:opacity-50"
+                        onClick={() => void startEditingOption(key)}
+                        disabled={selectedIndex < 0 || savingRegistrationOptions}
+                      >
+                        Update Selected
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded bg-red-600 px-3 py-1 text-white disabled:opacity-50"
+                        onClick={() => void deleteSelectedOption(key)}
+                        disabled={selectedIndex < 0 || savingRegistrationOptions}
+                      >
+                        Delete Selected
+                      </button>
+                    </div>
+                    {editIndex >= 0 ? (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <input
+                          className="min-w-64 flex-1 rounded border border-slate-300 px-3 py-2"
+                          value={editingOptionValues[key]}
+                          onChange={(event) => setEditingOptionValues((prev) => ({ ...prev, [key]: event.target.value }))}
+                        />
+                        <button
+                          type="button"
+                          className="rounded bg-sky-600 px-3 py-2 text-white"
+                          onClick={() => void saveEditedOption(key)}
+                          disabled={savingRegistrationOptions}
+                        >
+                          Save Update
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded bg-slate-200 px-3 py-2 text-slate-700"
+                          onClick={() => {
+                            setEditingOptionIndexes((prev) => ({ ...prev, [key]: -1 }));
+                            setEditingOptionValues((prev) => ({ ...prev, [key]: "" }));
+                          }}
+                          disabled={savingRegistrationOptions}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : null}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <input
+                        className="min-w-64 flex-1 rounded border border-slate-300 px-3 py-2"
+                        placeholder={`Add new ${label.toLowerCase().replace(" options", "")}`}
+                        value={newOptionValues[key]}
+                        onChange={(event) => setNewOptionValues((prev) => ({ ...prev, [key]: event.target.value }))}
+                      />
+                      <button
+                        type="button"
+                        className="rounded bg-emerald-600 px-3 py-2 text-white"
+                        onClick={() => void addOptionToGroup(key)}
+                        disabled={savingRegistrationOptions}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <input
+              className="rounded border border-slate-300 px-3 py-2"
+              placeholder="Default fees amount"
+              type="number"
+              min={0}
+              step="0.01"
+              value={registrationOptions.defaultFeesAmount}
+              onChange={(event) => setRegistrationOptions((prev) => ({ ...prev, defaultFeesAmount: event.target.value }))}
+              required
+            />
+            <button
+              type="submit"
+              className="w-fit rounded bg-sky-600 px-4 py-2 font-medium text-white disabled:bg-sky-300"
+              disabled={savingRegistrationOptions}
+            >
+              {savingRegistrationOptions ? "Saving..." : "Save Registration Options"}
+            </button>
+          </form>
+        )}
       </section>
 
       {isMasterTenant ? (

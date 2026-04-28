@@ -8,7 +8,9 @@ import {
   getGatewayTenants,
   getGatewayUser,
   getGatewayUsers,
+  getGatewayRegistrationOptions,
   updateGatewayTenant,
+  updateGatewayRegistrationOptions,
   updateGatewayUser,
 } from "@/server/visionGatewayClient";
 import { IStudent } from "@/types";
@@ -55,6 +57,15 @@ const updateTenantArgsSchema = z.object({
   id: z.string().min(1),
   name: z.string().optional(),
   status: z.string().optional(),
+});
+
+const updateRegistrationOptionsArgsSchema = z.object({
+  sessionOptions: z.array(z.string()).optional(),
+  courseOptions: z.array(z.string()).optional(),
+  levelOptions: z.array(z.string()).optional(),
+  timeOptions: z.array(z.string()).optional(),
+  feesTypeOptions: z.array(z.string()).optional(),
+  defaultFeesAmount: z.number().nonnegative().optional(),
 });
 
 export type GraphQLContext = {
@@ -164,6 +175,10 @@ export const resolvers = {
         status: tenant.status,
       }));
     },
+    getRegistrationOptions: async (_: unknown, __: unknown, context: GraphQLContext) => {
+      const accessToken = requireAccessToken(context);
+      return getGatewayRegistrationOptions(accessToken);
+    },
   },
   Mutation: {
     addStudent: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
@@ -236,6 +251,12 @@ export const resolvers = {
         dbName: tenant.dbName,
         status: tenant.status,
       };
+    },
+    updateRegistrationOptions: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
+      requireTenantAdmin(context);
+      const accessToken = requireAccessToken(context);
+      const args = updateRegistrationOptionsArgsSchema.parse(rawArgs);
+      return updateGatewayRegistrationOptions(args, accessToken);
     },
   },
 };

@@ -47,11 +47,21 @@ export const typeDefs = /* GraphQL */ `
     status: String!
   }
 
+  type RegistrationOptions {
+    sessionOptions: [String!]!
+    courseOptions: [String!]!
+    levelOptions: [String!]!
+    timeOptions: [String!]!
+    feesTypeOptions: [String!]!
+    defaultFeesAmount: Float!
+  }
+
   type Query {
     getStudents: [Student]
     getUser(username: String!): User
     getUsers: [User!]
     getTenants: [Tenant!]
+    getRegistrationOptions: RegistrationOptions!
   }
 
   type AddStudentPayload {
@@ -83,5 +93,13 @@ export const typeDefs = /* GraphQL */ `
     deleteUser(id: ID!): Boolean!
     addTenant(domain: String!, name: String, status: String): Tenant
     updateTenant(id: ID!, name: String, status: String): Tenant
+    updateRegistrationOptions(
+      sessionOptions: [String!]
+      courseOptions: [String!]
+      levelOptions: [String!]
+      timeOptions: [String!]
+      feesTypeOptions: [String!]
+      defaultFeesAmount: Float
+    ): RegistrationOptions!
   }
 `;

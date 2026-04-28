@@ -37,3 +37,12 @@ export interface IUser {
   password?: string;
   role?: string;
 }
+
+export interface IRegistrationOptions {
+  sessionOptions: string[];
+  courseOptions: string[];
+  levelOptions: string[];
+  timeOptions: string[];
+  feesTypeOptions: string[];
+  defaultFeesAmount: number;
+}

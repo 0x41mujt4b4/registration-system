@@ -67,6 +67,15 @@ type GatewayTenant = {
   status: string;
 };
 
+type GatewayRegistrationOptions = {
+  sessionOptions: string[];
+  courseOptions: string[];
+  levelOptions: string[];
+  timeOptions: string[];
+  feesTypeOptions: string[];
+  defaultFeesAmount: number;
+};
+
 type GatewayLoginPayload = {
   access_token: string;
 };
@@ -318,4 +327,30 @@ export async function createGatewayStudent(
   });
 
   return parseGatewayResponse<GatewayStudent>(response);
+}
+
+export async function getGatewayRegistrationOptions(accessToken: string): Promise<GatewayRegistrationOptions> {
+  const response = await gatewayFetch("/registration-options", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return parseGatewayResponse<GatewayRegistrationOptions>(response);
+}
+
+export async function updateGatewayRegistrationOptions(
+  input: Partial<GatewayRegistrationOptions>,
+  accessToken: string,
+): Promise<GatewayRegistrationOptions> {
+  const response = await gatewayFetch("/registration-options", {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+  return parseGatewayResponse<GatewayRegistrationOptions>(response);
 }

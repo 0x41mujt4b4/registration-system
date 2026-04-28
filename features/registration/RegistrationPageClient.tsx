@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import InputField from "@/app/components/InputField";
@@ -8,6 +8,7 @@ import ModalError from "@/app/components/ModalError";
 import Receipt from "@/app/components/Receipt";
 import SelectField from "@/app/components/SelectField";
 import { fetchGraphQL, toUserFriendlyErrorMessage } from "@/lib/graphql-client";
+import { IRegistrationOptions } from "@/types";
 
 let html2pdf: ((...args: unknown[]) => { set: (options: unknown) => { from: (node: HTMLElement) => { save: () => Promise<void> } } }) | undefined;
 if (typeof window !== "undefined") {
@@ -15,38 +16,68 @@ if (typeof window !== "undefined") {
   html2pdf = require("html2pdf.js");
 }
 
-const SESSION_OPTIONS = ["Regular", "Mid-month"] as const;
-const COURSE_OPTIONS = ["Communication", "Ilets", "English club", "Esp"] as const;
-const LEVEL_OPTIONS = [
-  "Pre1",
-  "Pre2",
-  "Level-1",
-  "Level-2",
-  "Level-3",
-  "Level-4",
-  "Level-5",
-  "Level-6",
-  "Level-7",
-  "Level-8",
-] as const;
-const TIME_OPTIONS = ["11:00 - 01:00", "01:00 - 03:00", "03:00 - 05:00", "05:00 - 07:00"] as const;
-const FEES_TYPE_OPTIONS = ["Register-fees", "Course-fees", "Repeat-fees"] as const;
+const DEFAULT_REGISTRATION_OPTIONS: IRegistrationOptions = {
+  sessionOptions: ["Regular", "Mid-month"],
+  courseOptions: ["Communication", "Ilets", "English club", "Esp"],
+  levelOptions: ["Pre1", "Pre2", "Level-1", "Level-2", "Level-3", "Level-4", "Level-5", "Level-6", "Level-7", "Level-8"],
+  timeOptions: ["11:00 - 01:00", "01:00 - 03:00", "03:00 - 05:00", "05:00 - 07:00"],
+  feesTypeOptions: ["Register-fees", "Course-fees", "Repeat-fees"],
+  defaultFeesAmount: 1600,
+};
+
+function firstOption(options: string[], fallback: string): string {
+  return options[0] ?? fallback;
+}
 
 export default function RegistrationPageClient() {
+  const [registrationOptions, setRegistrationOptions] = useState<IRegistrationOptions | null>(null);
   const [name, setName] = useState("");
-  const [session, setSession] = useState<string>(SESSION_OPTIONS[0]);
-  const [course, setCourse] = useState<string>(COURSE_OPTIONS[0]);
-  const [level, setLevel] = useState<string>(LEVEL_OPTIONS[0]);
-  const [time, setTime] = useState<string>(TIME_OPTIONS[0]);
-  const [feesType, setFeesType] = useState<string>(FEES_TYPE_OPTIONS[0]);
-  const [feesAmount, setFeesAmount] = useState<number | string>(1600);
+  const [session, setSession] = useState<string>("");
+  const [course, setCourse] = useState<string>("");
+  const [level, setLevel] = useState<string>("");
+  const [time, setTime] = useState<string>("");
+  const [feesType, setFeesType] = useState<string>("");
+  const [feesAmount, setFeesAmount] = useState<number | string>("");
   const [date] = useState(new Date().toLocaleDateString());
   const [studentId, setStudentId] = useState<string | null>(null);
   const [receiptNumber, setReceiptNumber] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingOptions, setLoadingOptions] = useState(true);
   const receiptRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const loadOptions = async () => {
+      let effectiveOptions = DEFAULT_REGISTRATION_OPTIONS;
+      const result = await fetchGraphQL<{ getRegistrationOptions: IRegistrationOptions }>(`
+        query GetRegistrationOptions {
+          getRegistrationOptions {
+            sessionOptions
+            courseOptions
+            levelOptions
+            timeOptions
+            feesTypeOptions
+            defaultFeesAmount
+          }
+        }
+      `);
+
+      if (result.success) {
+        effectiveOptions = result.data.getRegistrationOptions;
+      }
+
+      setRegistrationOptions(effectiveOptions);
+      setSession(firstOption(effectiveOptions.sessionOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.sessionOptions, "Regular")));
+      setCourse(firstOption(effectiveOptions.courseOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.courseOptions, "Communication")));
+      setLevel(firstOption(effectiveOptions.levelOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.levelOptions, "Pre1")));
+      setTime(firstOption(effectiveOptions.timeOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.timeOptions, "11:00 - 01:00")));
+      setFeesType(firstOption(effectiveOptions.feesTypeOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.feesTypeOptions, "Register-fees")));
+      setFeesAmount(effectiveOptions.defaultFeesAmount ?? DEFAULT_REGISTRATION_OPTIONS.defaultFeesAmount);
+      setLoadingOptions(false);
+    };
+    void loadOptions();
+  }, []);
 
   const formData = {
     name,
@@ -118,13 +149,14 @@ export default function RegistrationPageClient() {
   };
 
   const clearForm = () => {
+    const options = registrationOptions ?? DEFAULT_REGISTRATION_OPTIONS;
     setName("");
-    setSession(SESSION_OPTIONS[0]);
-    setCourse(COURSE_OPTIONS[0]);
-    setLevel(LEVEL_OPTIONS[0]);
-    setTime(TIME_OPTIONS[0]);
-    setFeesType(FEES_TYPE_OPTIONS[0]);
-    setFeesAmount(1600);
+    setSession(firstOption(options.sessionOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.sessionOptions, "Regular")));
+    setCourse(firstOption(options.courseOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.courseOptions, "Communication")));
+    setLevel(firstOption(options.levelOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.levelOptions, "Pre1")));
+    setTime(firstOption(options.timeOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.timeOptions, "11:00 - 01:00")));
+    setFeesType(firstOption(options.feesTypeOptions, firstOption(DEFAULT_REGISTRATION_OPTIONS.feesTypeOptions, "Register-fees")));
+    setFeesAmount(options.defaultFeesAmount ?? DEFAULT_REGISTRATION_OPTIONS.defaultFeesAmount);
     setErrorMessage("");
   };
 
@@ -219,10 +251,13 @@ export default function RegistrationPageClient() {
           height={112}
           className="mx-auto mb-5 h-28 w-auto"
         />
-        <form onSubmit={handleSubmit} className="grid grid-cols-3 place-items-center gap-4">
+        {loadingOptions || !registrationOptions ? (
+          <div className="py-8 text-center text-sm text-slate-600">Loading registration options...</div>
+        ) : (
+          <form onSubmit={handleSubmit} className="grid grid-cols-3 place-items-center gap-4">
           <InputField id="name" label="Name" value={name} onChange={setName} required />
-          <SelectField id="time" label="Time" options={[...TIME_OPTIONS]} value={time} onChange={setTime} />
-          <SelectField id="level" label="Level" options={[...LEVEL_OPTIONS]} value={level} onChange={setLevel} />
+          <SelectField id="time" label="Time" options={registrationOptions.timeOptions} value={time} onChange={setTime} />
+          <SelectField id="level" label="Level" options={registrationOptions.levelOptions} value={level} onChange={setLevel} />
           <InputField
             id="fees-amount"
             label="Fees Amount"
@@ -233,21 +268,21 @@ export default function RegistrationPageClient() {
           <SelectField
             id="course"
             label="Course"
-            options={[...COURSE_OPTIONS]}
+            options={registrationOptions.courseOptions}
             value={course}
             onChange={setCourse}
           />
           <SelectField
             id="session"
             label="Session"
-            options={[...SESSION_OPTIONS]}
+            options={registrationOptions.sessionOptions}
             value={session}
             onChange={setSession}
           />
           <SelectField
             id="fees-type"
             label="Fees Type"
-            options={[...FEES_TYPE_OPTIONS]}
+            options={registrationOptions.feesTypeOptions}
             value={feesType}
             onChange={setFeesType}
             className=""
@@ -268,7 +303,8 @@ export default function RegistrationPageClient() {
               {isSubmitting ? "Saving..." : "Save & Print"}
             </Button>
           </div>
-        </form>
+          </form>
+        )}
         <div style={{ display: "none" }}>
           <Receipt ref={receiptRef} formData={formData} />
         </div>
