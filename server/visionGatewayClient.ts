@@ -65,6 +65,8 @@ type GatewayTenant = {
   name: string;
   dbName: string;
   status: string;
+  bootstrapAdminEmail?: string;
+  bootstrapAdminPassword?: string;
 };
 
 type GatewayRegistrationOptions = {

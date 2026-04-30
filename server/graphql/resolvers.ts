@@ -173,6 +173,8 @@ export const resolvers = {
         name: tenant.name,
         dbName: tenant.dbName,
         status: tenant.status,
+        bootstrapAdminEmail: tenant.bootstrapAdminEmail,
+        bootstrapAdminPassword: tenant.bootstrapAdminPassword,
       }));
     },
     getRegistrationOptions: async (_: unknown, __: unknown, context: GraphQLContext) => {
@@ -237,6 +239,8 @@ export const resolvers = {
         name: tenant.name,
         dbName: tenant.dbName,
         status: tenant.status,
+        bootstrapAdminEmail: tenant.bootstrapAdminEmail,
+        bootstrapAdminPassword: tenant.bootstrapAdminPassword,
       };
     },
     updateTenant: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {
@@ -250,6 +254,8 @@ export const resolvers = {
         name: tenant.name,
         dbName: tenant.dbName,
         status: tenant.status,
+        bootstrapAdminEmail: tenant.bootstrapAdminEmail,
+        bootstrapAdminPassword: tenant.bootstrapAdminPassword,
       };
     },
     updateRegistrationOptions: async (_: unknown, rawArgs: unknown, context: GraphQLContext) => {

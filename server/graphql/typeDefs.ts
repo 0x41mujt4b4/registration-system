@@ -45,6 +45,8 @@ export const typeDefs = /* GraphQL */ `
     name: String!
     dbName: String!
     status: String!
+    bootstrapAdminEmail: String
+    bootstrapAdminPassword: String
   }
 
   type RegistrationOptions {
