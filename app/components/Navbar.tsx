@@ -22,7 +22,7 @@ export default function Navbar() {
     }`;
 
   return (
-    <nav className="mb-4 w-full border-b border-slate-300 bg-slate-200/95 backdrop-blur md:static md:text-sm">
+    <nav className="sticky top-0 z-50 mb-4 w-full border-b border-slate-300 bg-slate-200/95 shadow-sm backdrop-blur md:text-sm">
       <div className="mx-auto flex max-w-7xl justify-between px-4">
         <div className="flex items-center justify-between py-3 md:block md:py-2">
           <Link href="/">
