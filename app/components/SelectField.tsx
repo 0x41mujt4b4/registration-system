@@ -1,3 +1,7 @@
+const controlClass =
+  "box-border h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-sans text-slate-900 shadow-sm outline-none transition-colors " +
+  "focus:border-sky-600 focus:ring-1 focus:ring-sky-600";
+
 interface SelectFieldProps {
   id: string;
   label: string;
@@ -10,13 +14,15 @@ interface SelectFieldProps {
 
 export default function SelectField({ id, label, options, placeholder, value, onChange, className }: SelectFieldProps) {
   return (
-    <div className={`w-full ${className || ""}`}>
-        <label htmlFor={id} className="block uppercase tracking-wide text-black text-sm font-bold mb-2">{label}</label>
+    <div className={`w-full ${className ?? ""}`}>
+      <label htmlFor={id} className="mb-2 block text-sm font-bold uppercase tracking-wide text-slate-900">
+        {label}
+      </label>
       <select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full p-3 text-black bg-white border rounded-lg shadow-sm outline-none focus:ring-offset-1 focus:ring-sky-600 focus:ring-1"
+        className={controlClass}
       >
         {placeholder ? (
           <option value="" disabled>
