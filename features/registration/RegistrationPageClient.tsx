@@ -236,14 +236,14 @@ export default function RegistrationPageClient() {
   };
 
   return (
-    <div className="container mx-auto px-4 pb-6">
+    <div className="mx-auto flex w-full min-h-[calc(100dvh-5rem)] max-w-7xl flex-col items-center justify-center px-4 py-6">
       <ModalError
         open={open}
         setOpen={setOpen}
         title="Could not save student"
         message={errorMessage || "Please try again."}
       />
-      <div className="surface-elevated rounded-lg p-6 md:p-10">
+      <div className="surface-elevated w-full max-w-5xl rounded-xl p-7 md:p-12">
         <Image
           src="/vision_logo.png"
           alt="vision logo"

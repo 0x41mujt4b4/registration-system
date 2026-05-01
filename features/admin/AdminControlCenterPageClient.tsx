@@ -607,17 +607,11 @@ export default function AdminControlCenterPageClient({
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 text-slate-800">
       <div className="surface-elevated rounded-xl p-6 md:p-8">
-        <header className="border-b border-slate-300/80 pb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Admin control center</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600">
-            Manage staff, registration choices, and branches. Available only for authorized administrator accounts.
-          </p>
-          {error ? (
-            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div>
-          ) : null}
-        </header>
+        {error ? (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div>
+        ) : null}
 
-        <div className="pt-6">
+        <div>
           <Tabs defaultValue="staff" className="w-full">
             <TabsList className="flex w-full flex-wrap justify-start gap-1 md:w-auto">
               <TabsTrigger value="staff">Staff</TabsTrigger>

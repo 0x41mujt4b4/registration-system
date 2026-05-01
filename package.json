@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "seed:students": "node scripts/inject-100-students.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

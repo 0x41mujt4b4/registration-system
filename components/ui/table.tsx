@@ -2,9 +2,14 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
-  ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
+type TableProps = React.HTMLAttributes<HTMLTableElement> & {
+  /** Replaces the default `overflow-x-auto` wrapper. Use e.g. `overflow-visible` when a parent is the only scroll container (sticky headers). */
+  containerClassName?: string
+}
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, containerClassName, ...props }, ref) => (
+    <div className={cn("relative w-full min-w-0", containerClassName ?? "overflow-x-auto")}>
       <table
         ref={ref}
         className={cn("w-full caption-bottom text-sm", className)}
