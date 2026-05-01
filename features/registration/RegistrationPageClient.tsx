@@ -236,14 +236,14 @@ export default function RegistrationPageClient() {
   };
 
   return (
-    <div className="mx-auto flex w-full min-h-[calc(100dvh-5rem)] max-w-7xl flex-col items-center justify-center px-4 py-6">
+    <main className="mx-auto w-full max-w-7xl px-4 py-6 text-slate-800">
       <ModalError
         open={open}
         setOpen={setOpen}
         title="Could not save student"
         message={errorMessage || "Please try again."}
       />
-      <div className="surface-elevated w-full max-w-5xl rounded-xl p-7 md:p-12">
+      <div className="surface-elevated w-full rounded-xl p-6 md:p-8">
         <Image
           src="/vision_logo.png"
           alt="vision logo"
@@ -293,7 +293,7 @@ export default function RegistrationPageClient() {
               type="button"
               onClick={clearForm}
             >
-              Clear
+              Reset
             </Button>
             <Button
               className="rounded-lg bg-sky-600 text-md text-white duration-150 hover:bg-white hover:text-sky-600 active:bg-sky-600 active:text-white disabled:cursor-not-allowed disabled:bg-sky-400"
@@ -309,6 +309,6 @@ export default function RegistrationPageClient() {
           <Receipt ref={receiptRef} formData={formData} />
         </div>
       </div>
-    </div>
+    </main>
   );
 }
