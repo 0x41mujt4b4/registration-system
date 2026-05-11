@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import InputField from "@/app/components/InputField";
 import ModalError from "@/app/components/ModalError";
-import Receipt from "@/app/components/Receipt";
+import Receipt, { RECEIPT_INNER_MM } from "@/app/components/Receipt";
 import SelectField from "@/app/components/SelectField";
 import { fetchGraphQL, toUserFriendlyErrorMessage } from "@/lib/graphql-client";
 import { IRegistrationOptions } from "@/types";
@@ -123,7 +124,8 @@ export default function RegistrationPageClient() {
         <head>
           <title>Receipt</title>
           <style>
-            body { margin: 0; padding: 16px; font-family: Arial, sans-serif; }
+            @page { size: 210mm 148mm; margin: 8mm; }
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; color: #000000; background: #ffffff; }
           </style>
         </head>
         <body>${styledClone.outerHTML}</body>
@@ -139,11 +141,11 @@ export default function RegistrationPageClient() {
     if (!receiptRef.current || !html2pdf) return;
 
     const options = {
-      margin: 1,
+      margin: 8,
       filename: "receipt.pdf",
       image: { type: "png", quality: 1 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+      jsPDF: { unit: "mm", format: [210, 148] as [number, number], orientation: "l" },
     };
     await html2pdf().set(options).from(receiptRef.current).save();
   };
@@ -235,8 +237,10 @@ export default function RegistrationPageClient() {
 
       const student_id = addStudentResult.data.addStudent.id;
       const receipt_number = addStudentResult.data.addStudent.receiptNumber;
-      setStudentId(student_id);
-      setReceiptNumber(receipt_number);
+      flushSync(() => {
+        setStudentId(student_id);
+        setReceiptNumber(receipt_number);
+      });
 
       handlePrint();
       await handleSave();
@@ -341,7 +345,11 @@ export default function RegistrationPageClient() {
           </div>
           </form>
         )}
-        <div style={{ display: "none" }}>
+        <div
+          className="pointer-events-none fixed left-[-10000px] top-0 z-[-1] bg-white text-black"
+          style={{ width: `${RECEIPT_INNER_MM.w}mm`, maxWidth: `${RECEIPT_INNER_MM.w}mm` }}
+          aria-hidden
+        >
           <Receipt ref={receiptRef} formData={formData} />
         </div>
       </div>
