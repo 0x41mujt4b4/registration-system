@@ -10,9 +10,10 @@ interface SelectFieldProps {
   value: string;
   onChange: (val: string) => void;
   className?: string;
+  required?: boolean;
 }
 
-export default function SelectField({ id, label, options, placeholder, value, onChange, className }: SelectFieldProps) {
+export default function SelectField({ id, label, options, placeholder, value, onChange, className, required }: SelectFieldProps) {
   return (
     <div className={`w-full ${className ?? ""}`}>
       <label htmlFor={id} className="mb-2 block text-sm font-bold uppercase tracking-wide text-slate-900">
@@ -22,6 +23,7 @@ export default function SelectField({ id, label, options, placeholder, value, on
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        required={required}
         className={controlClass}
       >
         {placeholder ? (

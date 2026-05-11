@@ -309,23 +309,34 @@ export async function getGatewayStudents(accessToken: string): Promise<GatewaySt
 export async function createGatewayStudent(
   input: {
     name: string;
-    time: string;
     feesAmount: number;
     feesType: string;
-    course: string;
-    level: string;
-    session: string;
+    time?: string;
+    course?: string;
+    level?: string;
+    session?: string;
     paymentDate?: string;
   },
   accessToken: string,
 ): Promise<GatewayStudent> {
+  const body: Record<string, unknown> = {
+    name: input.name,
+    feesAmount: input.feesAmount,
+    feesType: input.feesType,
+  };
+  if (input.time) body.time = input.time;
+  if (input.course) body.course = input.course;
+  if (input.level) body.level = input.level;
+  if (input.session) body.session = input.session;
+  if (input.paymentDate) body.paymentDate = input.paymentDate;
+
   const response = await gatewayFetch("/students", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(input),
+    body: JSON.stringify(body),
   });
 
   return parseGatewayResponse<GatewayStudent>(response);

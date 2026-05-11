@@ -160,6 +160,17 @@ export default function RegistrationPageClient() {
     setErrorMessage("");
   };
 
+  const clearAllFields = () => {
+    setName("");
+    setSession("");
+    setCourse("");
+    setLevel("");
+    setTime("");
+    setFeesType("");
+    setFeesAmount("");
+    setErrorMessage("");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -168,26 +179,32 @@ export default function RegistrationPageClient() {
       alert("Please enter a valid name and fees amount.");
       return;
     }
+    if (!feesType) {
+      alert("Please select a Fees Type.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
+      const optionalOrUndefined = (value: string) => (value && value.trim() ? value : undefined);
+
       const addStudentResult = await fetchGraphQL<{ addStudent: { id: string; receiptNumber: number } }>(
         `
         mutation AddStudent(
           $name: String!
-          $time: String!
           $feesAmount: Float!
           $feesType: String!
-          $course: String!
-          $level: String!
-          $session: String!
+          $time: String
+          $course: String
+          $level: String
+          $session: String
           $paymentDate: String
         ) {
           addStudent(
             name: $name
-            time: $time
             feesAmount: $feesAmount
             feesType: $feesType
+            time: $time
             course: $course
             level: $level
             session: $session
@@ -200,12 +217,12 @@ export default function RegistrationPageClient() {
       `,
         {
           name,
-          time,
           feesAmount: feesNum,
           feesType,
-          course,
-          level,
-          session,
+          time: optionalOrUndefined(time),
+          course: optionalOrUndefined(course),
+          level: optionalOrUndefined(level),
+          session: optionalOrUndefined(session),
           paymentDate: new Date().toISOString(),
         },
       );
@@ -256,18 +273,34 @@ export default function RegistrationPageClient() {
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <InputField id="name" label="Name" value={name} onChange={setName} required />
-          <SelectField id="time" label="Time" options={registrationOptions.timeOptions} value={time} onChange={setTime} />
-          <SelectField id="level" label="Level" options={registrationOptions.levelOptions} value={level} onChange={setLevel} />
+          <SelectField
+            id="time"
+            label="Time"
+            placeholder="Select time"
+            options={registrationOptions.timeOptions}
+            value={time}
+            onChange={setTime}
+          />
+          <SelectField
+            id="level"
+            label="Level"
+            placeholder="Select level"
+            options={registrationOptions.levelOptions}
+            value={level}
+            onChange={setLevel}
+          />
           <InputField
             id="fees-amount"
             label="Fees Amount"
             type="number"
             value={feesAmount}
             onChange={(value) => setFeesAmount(value)}
+            required
           />
           <SelectField
             id="course"
             label="Course"
+            placeholder="Select course"
             options={registrationOptions.courseOptions}
             value={course}
             onChange={setCourse}
@@ -275,6 +308,7 @@ export default function RegistrationPageClient() {
           <SelectField
             id="session"
             label="Session"
+            placeholder="Select session"
             options={registrationOptions.sessionOptions}
             value={session}
             onChange={setSession}
@@ -282,18 +316,20 @@ export default function RegistrationPageClient() {
           <SelectField
             id="fees-type"
             label="Fees Type"
+            placeholder="Select fees type"
             options={registrationOptions.feesTypeOptions}
             value={feesType}
             onChange={setFeesType}
+            required
             className=""
           />
           <div className="flex flex-wrap justify-end gap-3 md:col-span-2 xl:col-span-3">
             <Button
               className="rounded-lg bg-red-600 text-md text-white duration-150 hover:bg-white hover:text-red-600 active:bg-red-600 active:text-white"
               type="button"
-              onClick={clearForm}
+              onClick={clearAllFields}
             >
-              Reset
+              Clear
             </Button>
             <Button
               className="rounded-lg bg-sky-600 text-md text-white duration-150 hover:bg-white hover:text-sky-600 active:bg-sky-600 active:text-white disabled:cursor-not-allowed disabled:bg-sky-400"

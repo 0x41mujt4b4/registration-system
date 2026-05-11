@@ -21,12 +21,12 @@ const getUserArgsSchema = z.object({
 
 const addStudentArgsSchema = z.object({
   name: z.string().min(1),
-  time: z.string().min(1),
-  feesAmount: z.number(),
+  feesAmount: z.number().positive(),
   feesType: z.string().min(1),
-  course: z.string().min(1),
-  level: z.string().min(1),
-  session: z.string().min(1),
+  time: z.string().min(1).optional(),
+  course: z.string().min(1).optional(),
+  level: z.string().min(1).optional(),
+  session: z.string().min(1).optional(),
   paymentDate: z.string().datetime().optional(),
 });
 
