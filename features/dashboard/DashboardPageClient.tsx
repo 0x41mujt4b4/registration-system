@@ -93,12 +93,6 @@ export default function DashboardPageClient() {
     void fetchData();
   }, []);
 
-  const handleExport = () => {
-    if (!tableRef.current || isLoading || loadError || data.length === 0) return;
-    const workbook = XLSX.utils.table_to_book(tableRef.current);
-    XLSX.writeFile(workbook, "students_report.xlsx");
-  };
-
   const globalSearchFilter: FilterFn<IStudent> = (row, _columnId, filterValue) => {
     const query = String(filterValue ?? "").trim().toLowerCase();
     if (!query) return true;
@@ -139,6 +133,30 @@ export default function DashboardPageClient() {
       rowSelection,
     },
   });
+
+  const handleExport = () => {
+    if (isLoading || loadError || data.length === 0) return;
+
+    const visibleColumns = table.getVisibleLeafColumns();
+    const headers = visibleColumns.map((col) => COLUMN_LABELS[col.id] ?? col.id.replace(/_/g, " "));
+    const bodyRows = table.getRowModel().rows.map((row) =>
+      visibleColumns.map((col) => {
+        if (col.id === "amount") {
+          const raw = row.getValue("amount");
+          const amount = typeof raw === "number" ? raw : parseFloat(String(raw ?? ""));
+          return Number.isNaN(amount) ? "" : amount;
+        }
+        const value = row.getValue(col.id);
+        if (value === null || value === undefined) return "";
+        return value as string | number;
+      }),
+    );
+
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...bodyRows]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "students_report.xlsx");
+  };
 
   const studentCount = !isLoading && !loadError ? data.length : null;
   const hasRows = !isLoading && !loadError && data.length > 0;
