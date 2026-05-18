@@ -30,6 +30,15 @@ function firstOption(options: string[], fallback: string): string {
   return options[0] ?? fallback;
 }
 
+function receiptPdfFilename(studentName: string): string {
+  const base = studentName
+    .trim()
+    .replace(/[/\\?%*:|"<>#]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return `${base || "receipt"}.pdf`;
+}
+
 export default function RegistrationPageClient() {
   const [registrationOptions, setRegistrationOptions] = useState<IRegistrationOptions | null>(null);
   const [name, setName] = useState("");
@@ -142,7 +151,7 @@ export default function RegistrationPageClient() {
 
     const options = {
       margin: 8,
-      filename: "receipt.pdf",
+      filename: receiptPdfFilename(name),
       image: { type: "png", quality: 1 },
       html2canvas: { scale: 2, backgroundColor: "#ffffff" },
       jsPDF: { unit: "mm", format: [210, 148] as [number, number], orientation: "l" },
